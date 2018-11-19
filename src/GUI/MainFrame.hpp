@@ -17,6 +17,19 @@ public:
 
     MainFrame(Chip8Emu* app, const wxString& title, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize);
     ~MainFrame();
+
+    void OnOpenROM(wxCommandEvent& event);
+    void OnCloseROM(wxCommandEvent& event);
+    void OnExit(wxCommandEvent& event);
+
+    wxDECLARE_EVENT_TABLE();
+};
+
+enum
+{
+    idOnOpenROM = wxID_HIGHEST + 1,
+    idOnCloseROM,
+    idOnExit,
 };
 
 #endif // MAINFRAME_HPP

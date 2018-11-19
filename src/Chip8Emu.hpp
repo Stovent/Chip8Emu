@@ -10,7 +10,7 @@ class Chip8Emu;
 
 class Chip8Emu : public wxApp
 {
-    Chip8 cpu;
+    Chip8* cpu;
 
 public:
     MainFrame* mainFrame;
