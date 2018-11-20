@@ -43,7 +43,8 @@ void MainFrame::OnOpenROM(wxCommandEvent& event)
 
 void MainFrame::OnCloseROM(wxCommandEvent& event)
 {
-
+    app->cpu->CloseROM();
+    app->cpu->Pause();
 }
 
 void MainFrame::OnExit(wxCommandEvent& event)

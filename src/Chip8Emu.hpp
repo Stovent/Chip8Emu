@@ -10,9 +10,9 @@ class Chip8Emu;
 
 class Chip8Emu : public wxApp
 {
+public:
     Chip8* cpu;
 
-public:
     MainFrame* mainFrame;
 
     virtual bool OnInit();

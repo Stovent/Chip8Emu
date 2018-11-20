@@ -6,8 +6,8 @@
 GamePanel::GamePanel(Chip8Emu* app, MainFrame* parent) : wxPanel(parent)
 {
     this->app = app;
-    this->parent = parent;
-//    memset(screen, 0, 64 * 32);
+    scale = 8;
+    memset(screen, 0, 64 * 32);
 }
 
 void GamePanel::Update()
@@ -20,15 +20,39 @@ void GamePanel::Update()
             if(screen[j][i])
             {
                 dc.SetBrush(*wxWHITE_BRUSH);
-//                dc.SetPen(wxPen(wxColor(255, 255, 255), 1));
             }
             else
             {
                 dc.SetBrush(*wxBLACK_BRUSH);
-//                dc.SetPen(wxPen(wxColor(0, 0, 0), 1));
             }
 
-            dc.DrawPoint(i, j);
+            dc.DrawRectangle(i * scale, j * scale, scale, scale);
         }
     }
+}
+
+void GamePanel::Draw(uint8_t x, uint8_t y, uint8_t n)
+{
+    uint8_t ligne;
+
+    for(int j = 0; j < n; j++)
+    {
+        ligne = app->cpu->memory[app->cpu->I + j];
+
+        for(int i = 0; i < 8; i++)
+        {
+            if(ligne & (0x80 >> i))
+            {
+                if(screen[app->cpu->V[y] + j][app->cpu->V[x] + i])
+                    screen[app->cpu->V[y] + j][app->cpu->V[x] + i] = 0;
+                else
+                    screen[app->cpu->V[y] + j][app->cpu->V[x] + i] = 255;
+            }
+        }
+    }
+}
+
+void GamePanel::ClearScreen()
+{
+    memset(screen, 0, 64 * 32);
 }

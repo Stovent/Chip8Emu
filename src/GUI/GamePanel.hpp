@@ -12,11 +12,13 @@ class GamePanel;
 class GamePanel : public wxPanel
 {
     Chip8Emu* app;
-    MainFrame* parent;
     uint8_t screen[32][64];
+    uint8_t scale;
 
 public:
     GamePanel(Chip8Emu* app, MainFrame* parent);
+    void Draw(uint8_t x, uint8_t y, uint8_t n);
+    void ClearScreen();
     void Update();
 };
 #endif // GAMEPANEL_HPP
