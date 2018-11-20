@@ -3,11 +3,21 @@
 #include <cstring>
 #include <cstdio>
 
-GamePanel::GamePanel(Chip8Emu* app, MainFrame* parent) : wxPanel(parent)
+wxBEGIN_EVENT_TABLE(GamePanel, wxPanel)
+    EVT_TIMER(idOnTimer, GamePanel::OnTimer)
+wxEND_EVENT_TABLE()
+
+GamePanel::GamePanel(Chip8Emu* app, MainFrame* parent) : wxPanel(parent), timer(this, idOnTimer)
 {
     this->app = app;
     scale = 8;
     memset(screen, 0, 64 * 32);
+    timer.Start(160);
+}
+
+void GamePanel::OnTimer(wxTimerEvent& event)
+{
+    Update();
 }
 
 void GamePanel::Update()

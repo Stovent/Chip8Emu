@@ -1,5 +1,10 @@
 #include "Chip8Emu.hpp"
 
+void runGameThread(Chip8Emu* app)
+{
+    app->cpu->Run();
+}
+
 bool Chip8Emu::OnInit()
 {
     mainFrame = new MainFrame(this, "Chip8Emu");
@@ -9,9 +14,21 @@ bool Chip8Emu::OnInit()
 
     cpu = new Chip8(mainFrame->gamePanel);
 
-    cpu->LoadROM("ROM/MAZE.ch8");
-
-//    cpu.Run();
-
     return true;
+}
+
+void Chip8Emu::StartGameThread()
+{
+    if(gameThread == nullptr)
+        gameThread = new std::thread(runGameThread, this);
+}
+
+void Chip8Emu::StopGameThread()
+{
+    if(gameThread != nullptr)
+    {
+        gameThread->join();
+        delete gameThread;
+        gameThread = nullptr;
+    }
 }

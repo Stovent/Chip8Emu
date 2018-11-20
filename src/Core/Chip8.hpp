@@ -15,7 +15,6 @@ typedef struct
 
 class Chip8
 {
-    bool run;
     GamePanel* gamePanel;
     Instruction instructions[35];
 
@@ -29,6 +28,9 @@ public:
     uint8_t sound;
     uint8_t timer;
 
+    bool run;
+    bool stop;
+
     Chip8(GamePanel* gp);
     ~Chip8();
     void Run();
@@ -38,7 +40,7 @@ public:
     void Execute();
 
     void LoadFont();
-    bool LoadROM(const char* file);
+    bool OpenROM(const char* file);
     void CloseROM();
 
     uint16_t GetNextOpcode();

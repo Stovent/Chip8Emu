@@ -38,13 +38,14 @@ MainFrame::~MainFrame()
 
 void MainFrame::OnOpenROM(wxCommandEvent& event)
 {
-
+    app->cpu->OpenROM("ROM/MAZE.ch8");
+    app->StartGameThread();
 }
 
 void MainFrame::OnCloseROM(wxCommandEvent& event)
 {
     app->cpu->CloseROM();
-    app->cpu->Pause();
+    app->StopGameThread();
 }
 
 void MainFrame::OnExit(wxCommandEvent& event)

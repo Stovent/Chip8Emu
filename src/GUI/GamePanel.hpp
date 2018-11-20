@@ -4,6 +4,7 @@
 class GamePanel;
 
 #include <wx/panel.h>
+#include <wx/timer.h>
 #include <wx/dcclient.h>
 
 #include "MainFrame.hpp"
@@ -14,11 +15,21 @@ class GamePanel : public wxPanel
     Chip8Emu* app;
     uint8_t screen[32][64];
     uint8_t scale;
+    wxTimer timer;
 
 public:
     GamePanel(Chip8Emu* app, MainFrame* parent);
     void Draw(uint8_t x, uint8_t y, uint8_t n);
     void ClearScreen();
     void Update();
+    void OnTimer(wxTimerEvent& event);
+
+    wxDECLARE_EVENT_TABLE();
 };
+
+enum
+{
+    idOnTimer = wxID_LAST,
+};
+
 #endif // GAMEPANEL_HPP

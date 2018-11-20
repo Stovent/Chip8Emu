@@ -7,7 +7,8 @@
 Chip8::Chip8(GamePanel* gp)
 {
     gamePanel = gp;
-    run = false;
+    run = true;
+    stop = false;
     memory = new int8_t[4096];
 
     Init();
@@ -58,6 +59,10 @@ Chip8::~Chip8()
 
 bool Chip8::Init()
 {
+    if(memory == nullptr)
+        return false;
+    memset(memory, 0, 4096);
+
     sound = 0;
     timer = 0;
     PC = 512;
@@ -69,15 +74,7 @@ bool Chip8::Init()
     for(int i = 0; i < 16; i++)
         stack[i] = 0;
 
-    if(memory == nullptr)
-        return false;
-    memset(memory, 0, 4096);
     return true;
-}
-
-void Chip8::Pause(bool val)
-{
-    run = val;
 }
 
 void Chip8::Restart(bool runAgain)
@@ -90,8 +87,14 @@ void Chip8::Restart(bool runAgain)
 void Chip8::Run()
 {
     while(true)
+    {
+        printf("before : %d %d\n", stop, run);
+        if(stop)
+            break;
         if(run)
             Execute();
+        printf("after : %d %d\n\n", stop, run);
+    }
 }
 
 void Chip8::LoadFont()
@@ -114,7 +117,7 @@ void Chip8::LoadFont()
     memory[75] = 0xF0; memory[76] = 0x80; memory[77] = 0xF0;memory[78] = 0x80; memory[79] = 0x80; // F
 }
 
-bool Chip8::LoadROM(const char* file)
+bool Chip8::OpenROM(const char* file)
 {
     FILE* f = fopen(file, "rb");
     if(!f)
@@ -122,15 +125,19 @@ bool Chip8::LoadROM(const char* file)
     fseek(f, 0, SEEK_END);
     long size = ftell(f);
     fseek(f, 0, SEEK_SET);
+    fclose(f);
 
     char* c = new char[size];
     fgets(c, size, f);
     memcpy(&memory[512], c, size);
+    stop = false;
     return true;
 }
 
 void Chip8::CloseROM()
 {
+    stop = true;
+    run = false;
     memset(memory + 512, 0, 3584);
 }
 
