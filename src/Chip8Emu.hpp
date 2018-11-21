@@ -22,6 +22,7 @@ public:
     MainFrame* mainFrame;
 
     virtual bool OnInit();
+    virtual int OnExit();
     void StartGameThread();
     void StopGameThread();
 };
