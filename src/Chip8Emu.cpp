@@ -7,11 +7,9 @@ void runGameThread(Chip8Emu* app)
 
 bool Chip8Emu::OnInit()
 {
-    mainFrame = new MainFrame(this, "Chip8Emu");
+    mainFrame = new MainFrame(this, "Chip8Emu", wxPoint(50, 50), wxSize(660, 410));
     if(mainFrame == nullptr)
         return false;
-//    mainFrame->gamePanel->SetRandom();
-//    mainFrame->gamePanel->Updatee();
 
     cpu = new Chip8(mainFrame->gamePanel);
 

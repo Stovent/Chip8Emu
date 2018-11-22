@@ -131,6 +131,8 @@ bool Chip8::OpenROM(const char* file)
     if(f == NULL)
         return false;
 
+    Init();
+
     fseek(f, 0, SEEK_END);
     long size = ftell(f);
     fseek(f, 0, SEEK_SET);
@@ -140,13 +142,15 @@ bool Chip8::OpenROM(const char* file)
     memcpy(&memory[512], c, size);
 
     fclose(f);
+    stop = false;
+    run = true;
     return true;
 }
 
 void Chip8::CloseROM()
 {
-    stop = true;
     run = false;
+    stop = true;
     memset(memory + 512, 0, 3584);
 }
 
@@ -167,6 +171,12 @@ int8_t Chip8::GetInstruction(uint16_t opcode) const
 
 void Chip8::Execute()
 {
+    if(PC > 4096)
+    {
+        run = false;
+        return;
+    }
+
     uint16_t opcode = GetNextOpcode(); PC += 2;
     uint16_t nnn = opcode & 0x0FFF;
     uint8_t kk = opcode & 0x00FF;

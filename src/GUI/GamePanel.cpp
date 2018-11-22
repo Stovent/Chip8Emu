@@ -6,7 +6,7 @@
 GamePanel::GamePanel(Chip8Emu* app, MainFrame* parent) : wxPanel(parent)
 {
     this->app = app;
-    scale = 8;
+    scale = 10;
     memset(screen, 0, 64 * 32);
 }
 
