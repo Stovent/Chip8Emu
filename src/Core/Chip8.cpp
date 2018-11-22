@@ -9,7 +9,7 @@ Chip8::Chip8(GamePanel* gp)
     gamePanel = gp;
     run = true;
     stop = false;
-    memory = new int8_t[4096];
+    memory = new uint8_t[4096];
 
     Init();
 
@@ -50,6 +50,7 @@ Chip8::Chip8(GamePanel* gp)
     instructions[LDIVx].opcode = 0xF055; instructions[LDIVx].mask = 0xF0FF;    /* FX55 */
     instructions[LDVxI].opcode = 0xF065; instructions[LDVxI].mask = 0xF0FF;    /* FX65 */
     }
+    LoadFont();
 }
 
 Chip8::~Chip8()
@@ -77,6 +78,15 @@ bool Chip8::Init()
     return true;
 }
 
+void Chip8::ExportMemory()
+{
+    FILE* f = fopen("memory.bin", "wb");
+    if(f == NULL)
+        return;
+    fwrite(memory, 1, 4096, f);
+    fclose(f);
+}
+
 void Chip8::Restart(bool runAgain)
 {
     run = false;
@@ -88,12 +98,10 @@ void Chip8::Run()
 {
     while(true)
     {
-        printf("before : %d %d\n", stop, run);
         if(stop)
             break;
         if(run)
             Execute();
-        printf("after : %d %d\n\n", stop, run);
     }
 }
 
@@ -120,17 +128,18 @@ void Chip8::LoadFont()
 bool Chip8::OpenROM(const char* file)
 {
     FILE* f = fopen(file, "rb");
-    if(!f)
+    if(f == NULL)
         return false;
+
     fseek(f, 0, SEEK_END);
     long size = ftell(f);
     fseek(f, 0, SEEK_SET);
-    fclose(f);
 
     char* c = new char[size];
-    fgets(c, size, f);
+    fread(c, 1, size, f);
     memcpy(&memory[512], c, size);
-    stop = false;
+
+    fclose(f);
     return true;
 }
 
@@ -143,7 +152,7 @@ void Chip8::CloseROM()
 
 uint16_t Chip8::GetNextOpcode()
 {
-    return (memory[PC] << 8) & memory[PC];
+    return (memory[PC] << 8) | memory[PC+1];
 }
 
 int8_t Chip8::GetInstruction(uint16_t opcode) const
@@ -164,8 +173,6 @@ void Chip8::Execute()
     uint8_t n = opcode & 0x000F;
     uint8_t x = (opcode & 0x0F00) >> 8;
     uint8_t y = (opcode & 0x00F0) >> 4;
-
-#define VF V[15]
 
     switch(GetInstruction(opcode))
     {
@@ -275,7 +282,6 @@ void Chip8::Execute()
     case DRW:
         gamePanel->Draw(x, y, n);
     break;
-
 
     }
 }

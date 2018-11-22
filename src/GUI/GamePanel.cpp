@@ -49,7 +49,7 @@ void GamePanel::Updatee()
             dc.DrawRectangle(i * scale, j * scale, scale, scale);
         }
     }
-    Update();
+//    Update();
 }
 
 void GamePanel::Draw(uint8_t x, uint8_t y, uint8_t n)
@@ -71,6 +71,7 @@ void GamePanel::Draw(uint8_t x, uint8_t y, uint8_t n)
             }
         }
     }
+    Updatee();
 }
 
 void GamePanel::ClearScreen()

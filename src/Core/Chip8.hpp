@@ -7,6 +7,8 @@ class Chip8;
 
 #include "../GUI/GamePanel.hpp"
 
+#define VF V[15]
+
 typedef struct
 {
     uint16_t opcode;
@@ -19,7 +21,7 @@ class Chip8
     Instruction instructions[35];
 
 public:
-    int8_t* memory;
+    uint8_t* memory;
     uint16_t stack[16];
     uint8_t V[16];
     uint16_t I;
@@ -38,6 +40,8 @@ public:
     void Pause(bool val = false);
     void Restart(bool runAgain = true);
     void Execute();
+
+    void ExportMemory();
 
     void LoadFont();
     bool OpenROM(const char* file);

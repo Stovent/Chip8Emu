@@ -22,6 +22,9 @@ public:
     void OnCloseROM(wxCommandEvent& event);
     void OnExit(wxCommandEvent& event);
 
+    void OnRebootCore(wxCommandEvent& event);
+    void OnExportMemory(wxCommandEvent& event);
+
     wxDECLARE_EVENT_TABLE();
 };
 
@@ -30,6 +33,8 @@ enum
     idOnOpenROM = wxID_HIGHEST + 1,
     idOnCloseROM,
     idOnExit,
+    idOnRebootCore,
+    idOnExportMemory,
 };
 
 #endif // MAINFRAME_HPP

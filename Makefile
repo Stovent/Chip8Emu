@@ -20,4 +20,3 @@ Chip8Emu :
 	$(CXX) $(CXXFLAGS) -O3 -I$(wxIPath) -I$(wxIMSWU) $(defines) $(wxLib) -c src/Chip8Emu.cpp -o bin/obj/Chip8Emu.o
 	$(CXX) $(CXXFLAGS) -O3 -I$(wxIPath) -I$(wxIMSWU) $(defines) $(wxLib) -c src/Main.cpp -o bin/obj/Main.o
 	$(CXX) -L$(wxLibPath) -o bin/Chip8Emu.exe $(obj) $(linkerFLAGS) $(wxLib)
-

@@ -10,8 +10,8 @@ bool Chip8Emu::OnInit()
     mainFrame = new MainFrame(this, "Chip8Emu");
     if(mainFrame == nullptr)
         return false;
-    mainFrame->gamePanel->SetRandom();
-    mainFrame->gamePanel->Updatee();
+//    mainFrame->gamePanel->SetRandom();
+//    mainFrame->gamePanel->Updatee();
 
     cpu = new Chip8(mainFrame->gamePanel);
 
