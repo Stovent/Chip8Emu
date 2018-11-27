@@ -23,7 +23,11 @@ public:
     void ClearScreen();
     void SetRandom();
     void Updatee();
-    void Updatee(wxSizeEvent& event);
+
+    void OnKeyUp(wxKeyEvent& event);
+    void OnKeyDown(wxKeyEvent& event);
+
+    wxDECLARE_EVENT_TABLE();
 };
 
 enum

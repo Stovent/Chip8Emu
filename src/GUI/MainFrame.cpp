@@ -26,7 +26,7 @@ MainFrame::MainFrame(Chip8Emu* app, const wxString& title, const wxPoint& pos, c
 
     wxMenu* emuMenu = new wxMenu;
     emuMenu->Append(idOnRebootCore, "Reboot Core\tCtrl+R");
-    emuMenu->Append(idOnExportMemory, "Export Memory\tCtrl+R");
+    emuMenu->Append(idOnExportMemory, "Export Memory\tCtrl+M");
 
     wxMenuBar* bar = new wxMenuBar();
     bar->Append(fileMenu, "File");
@@ -45,8 +45,10 @@ MainFrame::~MainFrame()
 
 void MainFrame::OnOpenROM(wxCommandEvent& event)
 {
-    app->cpu->OpenROM("ROM/MAZE.ch8");
-    app->StartGameThread();
+    if(app->cpu->OpenROM("ROM/PONg.ch8"))
+        app->StartGameThread();
+    else
+        wxMessageBox("Could not open ROM!");
 }
 
 void MainFrame::OnCloseROM(wxCommandEvent& event)

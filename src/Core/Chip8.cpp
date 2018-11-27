@@ -11,10 +11,11 @@ Chip8::Chip8(GamePanel* gp)
     stop = false;
     memory = new uint8_t[4096];
 
+    gp->ClearScreen();
+    gp->Updatee();
     Init();
 
     { // those brackets are just to be able to collapse it
-    instructions[SYS].opcode = 0x0000;  instructions[SYS].mask = 0xF000;     /* 0NNN */
     instructions[CLS].opcode = 0x00E0;  instructions[CLS].mask = 0xFFFF;     /* 00E0 */
     instructions[RET].opcode = 0x00EE;  instructions[RET].mask = 0xFFFF;     /* 00EE */
     instructions[JPaddr].opcode = 0x1000;  instructions[JPaddr].mask = 0xF000;     /* 1NNN */
@@ -50,7 +51,6 @@ Chip8::Chip8(GamePanel* gp)
     instructions[LDIVx].opcode = 0xF055; instructions[LDIVx].mask = 0xF0FF;    /* FX55 */
     instructions[LDVxI].opcode = 0xF065; instructions[LDVxI].mask = 0xF0FF;    /* FX65 */
     }
-    LoadFont();
 }
 
 Chip8::~Chip8()
@@ -63,17 +63,21 @@ bool Chip8::Init()
     if(memory == nullptr)
         return false;
     memset(memory, 0, 4096);
+    LoadFont();
+    last = wxGetLocalTimeMillis();
 
     sound = 0;
-    timer = 0;
+    delay = 0;
     PC = 512;
     SP = 0;
     I = 0;
 
     for(int i = 0; i < 16; i++)
+    {
         V[i] = 0;
-    for(int i = 0; i < 16; i++)
         stack[i] = 0;
+        keys[i] = 0;
+    }
 
     return true;
 }
@@ -143,7 +147,6 @@ bool Chip8::OpenROM(const char* file)
 
     fclose(f);
     stop = false;
-    run = true;
     return true;
 }
 
@@ -161,7 +164,7 @@ uint16_t Chip8::GetNextOpcode()
 
 int8_t Chip8::GetInstruction(uint16_t opcode) const
 {
-    for(uint8_t i = 0; i < 35; i++)
+    for(uint8_t i = 0; i < 34; i++)
     {
         if((opcode & instructions[i].mask) == instructions[i].opcode)
             return i;
@@ -174,28 +177,26 @@ void Chip8::Execute()
     if(PC > 4096)
     {
         run = false;
+    last = wxGetLocalTimeMillis();
         return;
     }
 
     uint16_t opcode = GetNextOpcode(); PC += 2;
     uint16_t nnn = opcode & 0x0FFF;
-    uint8_t kk = opcode & 0x00FF;
+    uint8_t nn = opcode & 0x00FF;
     uint8_t n = opcode & 0x000F;
     uint8_t x = (opcode & 0x0F00) >> 8;
     uint8_t y = (opcode & 0x00F0) >> 4;
 
     switch(GetInstruction(opcode))
     {
-    case SYS:
-        PC = nnn;
-    break;
 
     case CLS:
         gamePanel->ClearScreen();
     break;
 
     case RET:
-        PC = stack[SP--];
+        PC = stack[--SP];
     break;
 
     case JPaddr:
@@ -203,17 +204,17 @@ void Chip8::Execute()
     break;
 
     case CALL:
-        stack[++SP] = PC;
+        stack[SP++] = PC;
         PC = nnn;
     break;
 
     case SEVxByte:
-        if(V[x] == kk)
+        if(V[x] == nn)
             PC += 2;
     break;
 
     case SNEVxByte:
-        if(V[x] != kk)
+        if(V[x] != nn)
             PC += 2;
     break;
 
@@ -223,11 +224,11 @@ void Chip8::Execute()
     break;
 
     case LDVxByte:
-        V[x] = kk;
+        V[x] = nn;
     break;
 
     case ADDVxByte:
-        V[x] += kk;
+        V[x] += nn;
     break;
 
     case LDVxVy:
@@ -286,12 +287,69 @@ void Chip8::Execute()
 
     case RND:
         srand(time(0));
-        V[x] = (rand() % 256) & kk;
+        V[x] = (rand() % 256) & nn;
     break;
 
     case DRW:
         gamePanel->Draw(x, y, n);
     break;
 
+    case SKP:
+        if(keys[V[x]])
+            PC += 2;
+    break;
+
+    case SKNP:
+        if(!keys[V[x]])
+            PC += 2;
+    break;
+
+    case LDVxDT:
+        V[x] = delay;
+    break;
+
+    case LDVxK:
+        // TODO
+    break;
+
+    case LDDTVx:
+        delay = V[x];
+    break;
+
+    case LDSTVx:
+        sound = V[x];
+    break;
+
+    case ADDIVx:
+        I += V[x];
+    break;
+
+    case LDFVx:
+        I = V[x] * 5;
+    break;
+
+    case LDBVx:
+        memory[I] = V[x] / 100;
+        memory[I+1] = (V[x] - memory[I] * 100) / 10;
+        memory[I+2] = (V[x] - memory[I] * 100) - memory[I+1] * 10;
+    break;
+
+    case LDIVx:
+        for(uint8_t i = 0; i < x; i++)
+            memory[I + i] = V[i];
+    break;
+
+    case LDVxI:
+        for(uint8_t i = 0; i < x; i++)
+            V[i] = memory[I + i];
+    break;
+    }
+
+    if(wxGetLocalTimeMillis() - last > 16.666666)
+    {
+        last = wxGetLocalTimeMillis();
+        delay--;
+        sound--;
+        gamePanel->Updatee();
     }
 }

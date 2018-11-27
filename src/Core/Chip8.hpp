@@ -6,6 +6,7 @@ class Chip8;
 #include <cstdint>
 
 #include "../GUI/GamePanel.hpp"
+#include "../Chip8Emu.hpp"
 
 #define VF V[15]
 
@@ -28,7 +29,10 @@ public:
     uint16_t PC;
     uint16_t SP;
     uint8_t sound;
-    uint8_t timer;
+    uint8_t delay;
+    bool keys[16];
+
+    wxLongLong last;
 
     bool run;
     bool stop;
@@ -53,7 +57,6 @@ public:
 
 enum InstructionSet
 {
-    SYS,
     CLS,
     RET,
     JPaddr,
