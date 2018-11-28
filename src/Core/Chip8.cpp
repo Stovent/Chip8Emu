@@ -12,7 +12,7 @@ Chip8::Chip8(GamePanel* gp)
     memory = new uint8_t[4096];
 
     gp->ClearScreen();
-    gp->Updatee();
+    gp->RefreshScreen();
     Init();
 
     { // those brackets are just to be able to collapse it
@@ -177,7 +177,6 @@ void Chip8::Execute()
     if(PC > 4096)
     {
         run = false;
-    last = wxGetLocalTimeMillis();
         return;
     }
 
@@ -350,6 +349,8 @@ void Chip8::Execute()
         last = wxGetLocalTimeMillis();
         delay--;
         sound--;
-        gamePanel->Updatee();
+        gamePanel->RefreshScreen();
     }
+
+    wxMicroSleep(1000);
 }

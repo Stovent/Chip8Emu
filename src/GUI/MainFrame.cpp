@@ -55,6 +55,8 @@ void MainFrame::OnCloseROM(wxCommandEvent& event)
 {
     app->cpu->CloseROM();
     app->StopGameThread();
+    gamePanel->ClearScreen();
+    gamePanel->RefreshScreen();
 }
 
 void MainFrame::OnExit(wxCommandEvent& event)

@@ -10,11 +10,13 @@ class GamePanel;
 #include "MainFrame.hpp"
 #include "../Chip8Emu.hpp"
 
+#define WIDTH 64
+#define HEIGHT 32
+
 class GamePanel : public wxPanel
 {
     Chip8Emu* app;
-    uint8_t screen[32][64];
-    uint8_t scale;
+    unsigned char screen[WIDTH*HEIGHT*3];
 
 public:
     GamePanel(Chip8Emu* app, MainFrame* parent);
@@ -22,7 +24,7 @@ public:
     void Draw(uint8_t x, uint8_t y, uint8_t n);
     void ClearScreen();
     void SetRandom();
-    void Updatee();
+    void RefreshScreen();
 
     void OnKeyUp(wxKeyEvent& event);
     void OnKeyDown(wxKeyEvent& event);

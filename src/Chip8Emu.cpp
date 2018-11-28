@@ -31,7 +31,8 @@ void Chip8Emu::StopGameThread()
 {
     if(gameThread != nullptr)
     {
-        gameThread->join();
+        if(gameThread->joinable())
+            gameThread->join();
         delete gameThread;
         gameThread = nullptr;
     }

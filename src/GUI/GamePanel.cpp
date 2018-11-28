@@ -1,8 +1,5 @@
 #include "GamePanel.hpp"
 
-#include <cstring>
-#include <cstdio>
-
 wxBEGIN_EVENT_TABLE(GamePanel, wxPanel)
     EVT_KEY_UP(GamePanel::OnKeyUp)
     EVT_KEY_DOWN(GamePanel::OnKeyDown)
@@ -11,8 +8,7 @@ wxEND_EVENT_TABLE()
 GamePanel::GamePanel(Chip8Emu* app, MainFrame* parent) : wxPanel(parent)
 {
     this->app = app;
-    scale = 10;
-    memset(screen, 0, 64 * 32);
+    memset(screen, 0, WIDTH*HEIGHT*3);
 }
 
 GamePanel::~GamePanel()
@@ -23,32 +19,26 @@ GamePanel::~GamePanel()
 void GamePanel::SetRandom()
 {
     srand(time(0));
-    for(int j = 0; j < 32; j++)
-        for(int i = 0; i < 64; i++)
-            screen[j][i] = (rand() % 2) ? true : false;
+    for(int i = 0; i < WIDTH*HEIGHT*3; i+=3)
+        if(rand() % 2)
+        {
+            screen[i] = 255;
+            screen[i+1] = 255;
+            screen[i+2] = 255;
+        }
+        else
+        {
+            screen[i] = 0;
+            screen[i+1] = 0;
+            screen[i+2] = 0;
+        }
 }
 
-void GamePanel::Updatee()
+void GamePanel::RefreshScreen()
 {
     wxClientDC dc(this);
-    for(int j = 0; j < 32; j++)
-    {
-        for(int i = 0; i < 64; i++)
-        {
-            if(screen[j][i])
-            {
-                dc.SetBrush(*wxWHITE_BRUSH);
-                dc.SetPen(wxPen(wxColor(255, 255, 255), 1));
-            }
-            else
-            {
-                dc.SetBrush(*wxBLACK_BRUSH);
-                dc.SetPen(wxPen(wxColor(0, 0, 0), 1));
-            }
-
-            dc.DrawRectangle(i * scale, j * scale, scale, scale);
-        }
-    }
+    wxBitmap bitmap(wxImage(WIDTH, HEIGHT, screen, true).Scale(app->mainFrame->GetClientSize().x, app->mainFrame->GetClientSize().y, wxIMAGE_QUALITY_NEAREST));
+    dc.DrawBitmap(bitmap, 0, 0);
 }
 
 void GamePanel::Draw(uint8_t x, uint8_t y, uint8_t n)
@@ -63,21 +53,27 @@ void GamePanel::Draw(uint8_t x, uint8_t y, uint8_t n)
         {
             if(ligne & (0x80 >> i))
             {
-                if(screen[app->cpu->V[y] + j][app->cpu->V[x] + i])
+                if(screen[(app->cpu->V[y] + j) * 3 * WIDTH + (app->cpu->V[x] + i) * 3])
                 {
-                    screen[app->cpu->V[y] + j][app->cpu->V[x] + i] = 0;
+                    screen[(app->cpu->V[y] + j) * 3 * WIDTH + (app->cpu->V[x] + i) * 3] = 0;
+                    screen[(app->cpu->V[y] + j) * 3 * WIDTH + (app->cpu->V[x] + i) * 3 + 1] = 0;
+                    screen[(app->cpu->V[y] + j) * 3 * WIDTH + (app->cpu->V[x] + i) * 3 + 2] = 0;
                     app->cpu->VF = 1;
                 }
                 else
-                    screen[app->cpu->V[y] + j][app->cpu->V[x] + i] = 255;
+                {
+                    screen[(app->cpu->V[y] + j) * 3 * WIDTH + (app->cpu->V[x] + i) * 3] = 255;
+                    screen[(app->cpu->V[y] + j) * 3 * WIDTH + (app->cpu->V[x] + i) * 3 + 1] = 255;
+                    screen[(app->cpu->V[y] + j) * 3 * WIDTH + (app->cpu->V[x] + i) * 3 + 2] = 255;
+                }
             }
         }
     }
 }
-
+#undef A
 void GamePanel::ClearScreen()
 {
-    memset(screen, 0, 64 * 32);
+    memset(screen, 0, WIDTH * HEIGHT * 3);
 }
 
 void GamePanel::OnKeyUp(wxKeyEvent& event)
@@ -88,15 +84,15 @@ void GamePanel::OnKeyUp(wxKeyEvent& event)
         app->cpu->keys[0] = 0;
     break;
 
-    case WXK_NUMPAD1:
+    case WXK_NUMPAD7:
         app->cpu->keys[1] = 0;
     break;
 
-    case WXK_NUMPAD2:
+    case WXK_NUMPAD8:
         app->cpu->keys[2] = 0;
     break;
 
-    case WXK_NUMPAD3:
+    case WXK_NUMPAD9:
         app->cpu->keys[3] = 0;
     break;
 
@@ -112,15 +108,15 @@ void GamePanel::OnKeyUp(wxKeyEvent& event)
         app->cpu->keys[6] = 0;
     break;
 
-    case WXK_NUMPAD7:
+    case WXK_NUMPAD1:
         app->cpu->keys[7] = 0;
     break;
 
-    case WXK_NUMPAD8:
+    case WXK_NUMPAD2:
         app->cpu->keys[8] = 0;
     break;
 
-    case WXK_NUMPAD9:
+    case WXK_NUMPAD3:
         app->cpu->keys[9] = 0;
     break;
 
@@ -158,15 +154,15 @@ void GamePanel::OnKeyDown(wxKeyEvent& event)
         app->cpu->keys[0] = 1;
     break;
 
-    case WXK_NUMPAD1:
+    case WXK_NUMPAD7:
         app->cpu->keys[1] = 1;
     break;
 
-    case WXK_NUMPAD2:
+    case WXK_NUMPAD8:
         app->cpu->keys[2] = 1;
     break;
 
-    case WXK_NUMPAD3:
+    case WXK_NUMPAD9:
         app->cpu->keys[3] = 1;
     break;
 
@@ -182,15 +178,15 @@ void GamePanel::OnKeyDown(wxKeyEvent& event)
         app->cpu->keys[6] = 1;
     break;
 
-    case WXK_NUMPAD7:
+    case WXK_NUMPAD1:
         app->cpu->keys[7] = 1;
     break;
 
-    case WXK_NUMPAD8:
+    case WXK_NUMPAD2:
         app->cpu->keys[8] = 1;
     break;
 
-    case WXK_NUMPAD9:
+    case WXK_NUMPAD3:
         app->cpu->keys[9] = 1;
     break;
 
@@ -219,10 +215,16 @@ void GamePanel::OnKeyDown(wxKeyEvent& event)
     break;
 
     case 'A':
-        if(!app->cpu->run)
-            app->cpu->run = true;
-        else
+        if(app->cpu->run)
+        {
             app->cpu->run = false;
+            app->mainFrame->SetStatusText("Pause");
+        }
+        else
+        {
+            app->cpu->run = true;
+            app->mainFrame->SetStatusText("Running");
+        }
     break;
 
     case 'E':
