@@ -3,7 +3,7 @@ CXXFLAGS = -Wall -std=c++11 -pipe -mthreads
 linkerFLAGS = -s -static-libstdc++ -static-libgcc -static -mthreads
 
 defines = -D__GNUWIN32__ -D__WXMSW__ -DWXUSINGDLL -DwxUSE_UNICODE
-wxLib = -lwxmsw30u_core -lwxbase30u -lwxpng -lwxzlib -lole32 -luuid -loleaut32 -lwinspool -lcomctl32 -mwindows
+wxLib = -lwxmsw30u_adv -lwxmsw30u_core -lwxbase30u -lwxpng -lwxzlib -lole32 -luuid -loleaut32 -lwinspool -lcomctl32 -lwinmm -mwindows
 
 wxLibPath = C:\wxWidgets-3.0.4\lib\gcc_lib
 wxIPath = C:\wxWidgets-3.0.4\include

@@ -15,10 +15,11 @@ class GamePanel;
 
 class GamePanel : public wxPanel
 {
-    Chip8Emu* app;
     unsigned char screen[WIDTH*HEIGHT*3];
 
 public:
+    Chip8Emu* app;
+
     GamePanel(Chip8Emu* app, MainFrame* parent);
     ~GamePanel();
     void Draw(uint8_t x, uint8_t y, uint8_t n);

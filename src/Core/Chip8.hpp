@@ -5,6 +5,8 @@ class Chip8;
 
 #include <cstdint>
 
+#include <wx/sound.h>
+
 #include "../GUI/GamePanel.hpp"
 #include "../Chip8Emu.hpp"
 
@@ -20,6 +22,23 @@ class Chip8
 {
     GamePanel* gamePanel;
     Instruction instructions[35];
+    unsigned char beep[46] {0x52, 0x49, 0x46, 0x46, // RIFF
+                38, 0, 0, 0, // file size
+                0x57, 0x41, 0x56, 0x45, // WAVE
+                0x66, 0x6D, 0x74, 0x20,// fmt
+                16, 0, 0, 0, // bloc size
+                1, 0, // PCM
+                1, 0, // Mono
+                0x44, 0xAC, 0, 0, // 44100 Hz
+                0x44, 0xAC, 0, 0,
+                1, 0,
+                8, 0,
+                0x64, 0x61, 0x74, 0x61, // data
+                2, 0, 0, 0, // data size
+                255, 0
+    };
+
+    wxSound audio;
 
 public:
     uint8_t* memory;
@@ -42,13 +61,13 @@ public:
     void Run();
     bool Init();
     void Pause(bool val = false);
-    void Restart(bool runAgain = true);
     void Execute();
 
     void ExportMemory();
 
     void LoadFont();
     bool OpenROM(const char* file);
+    void Reset();
     void CloseROM();
 
     uint16_t GetNextOpcode();

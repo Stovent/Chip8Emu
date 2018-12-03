@@ -5,8 +5,10 @@
 
 wxBEGIN_EVENT_TABLE(MainFrame, wxFrame)
     EVT_MENU(idOnOpenROM, MainFrame::OnOpenROM)
+    EVT_MENU(idOnReloadROM, MainFrame::OnReloadROM)
     EVT_MENU(idOnCloseROM, MainFrame::OnCloseROM)
     EVT_MENU(idOnExit, MainFrame::OnExit)
+    EVT_MENU(idOnPause, MainFrame::OnPause)
     EVT_MENU(idOnRebootCore, MainFrame::OnRebootCore)
     EVT_MENU(idOnExportMemory, MainFrame::OnExportMemory)
 wxEND_EVENT_TABLE()
@@ -21,11 +23,14 @@ MainFrame::MainFrame(Chip8Emu* app, const wxString& title, const wxPoint& pos, c
 
     wxMenu* fileMenu = new wxMenu();
     fileMenu->Append(idOnOpenROM, "Open ROM\tCtrl+O");
+    fileMenu->Append(idOnReloadROM, "Reload ROM\tCtrl+R");
     fileMenu->Append(idOnCloseROM, "Close ROM\tCtrl+Q");
     fileMenu->Append(idOnExit, "Quit\tAlt+f4");
 
     wxMenu* emuMenu = new wxMenu;
-    emuMenu->Append(idOnRebootCore, "Reboot Core\tCtrl+R");
+    pause = emuMenu->AppendCheckItem(idOnPause, "Pause");
+    emuMenu->AppendSeparator();
+    emuMenu->Append(idOnRebootCore, "Reboot Core\tCtrl+B");
     emuMenu->Append(idOnExportMemory, "Export Memory\tCtrl+M");
 
     wxMenuBar* bar = new wxMenuBar();
@@ -45,10 +50,15 @@ MainFrame::~MainFrame()
 
 void MainFrame::OnOpenROM(wxCommandEvent& event)
 {
-    if(app->cpu->OpenROM("ROM/PONg.ch8"))
+    if(app->cpu->OpenROM("ROM/AIRPLANE.ch8"))
         app->StartGameThread();
     else
         wxMessageBox("Could not open ROM!");
+}
+
+void MainFrame::OnReloadROM(wxCommandEvent& event)
+{
+    app->cpu->Reset();
 }
 
 void MainFrame::OnCloseROM(wxCommandEvent& event)
@@ -62,6 +72,14 @@ void MainFrame::OnCloseROM(wxCommandEvent& event)
 void MainFrame::OnExit(wxCommandEvent& event)
 {
     Close(true);
+}
+
+void MainFrame::OnPause(wxCommandEvent& event)
+{
+    if(pause->IsChecked())
+        app->cpu->run = false;
+    else
+        app->cpu->run = true;
 }
 
 void MainFrame::OnRebootCore(wxCommandEvent& event)

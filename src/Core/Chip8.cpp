@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <cstdio>
 
-Chip8::Chip8(GamePanel* gp)
+Chip8::Chip8(GamePanel* gp) : audio(46, beep)
 {
     gamePanel = gp;
     run = true;
@@ -64,20 +64,7 @@ bool Chip8::Init()
         return false;
     memset(memory, 0, 4096);
     LoadFont();
-    last = wxGetLocalTimeMillis();
-
-    sound = 0;
-    delay = 0;
-    PC = 512;
-    SP = 0;
-    I = 0;
-
-    for(int i = 0; i < 16; i++)
-    {
-        V[i] = 0;
-        stack[i] = 0;
-        keys[i] = 0;
-    }
+    Reset();
 
     return true;
 }
@@ -91,21 +78,15 @@ void Chip8::ExportMemory()
     fclose(f);
 }
 
-void Chip8::Restart(bool runAgain)
-{
-    run = false;
-    Init();
-    run = true;
-}
-
 void Chip8::Run()
 {
     while(true)
     {
         if(stop)
             break;
-        if(run)
-            Execute();
+
+        gamePanel->app->mainFrame->SetStatusText(run ? "Running" : "Pause");
+        Execute();
     }
 }
 
@@ -148,6 +129,25 @@ bool Chip8::OpenROM(const char* file)
     fclose(f);
     stop = false;
     return true;
+}
+
+void Chip8::Reset()
+{
+    last = wxGetLocalTimeMillis();
+    gamePanel->ClearScreen();
+
+    sound = 0;
+    delay = 0;
+    PC = 512;
+    SP = 0;
+    I = 0;
+
+    for(int i = 0; i < 16; i++)
+    {
+        V[i] = 0;
+        stack[i] = 0;
+        keys[i] = 0;
+    }
 }
 
 void Chip8::CloseROM()
@@ -334,21 +334,27 @@ void Chip8::Execute()
     break;
 
     case LDIVx:
-        for(uint8_t i = 0; i < x; i++)
+        for(uint8_t i = 0; i <= x; i++)
             memory[I + i] = V[i];
     break;
 
     case LDVxI:
-        for(uint8_t i = 0; i < x; i++)
+        for(uint8_t i = 0; i <= x; i++)
             V[i] = memory[I + i];
     break;
     }
 
-    if(wxGetLocalTimeMillis() - last > 16.666666)
+    if(wxGetLocalTimeMillis() - last > 16)
     {
         last = wxGetLocalTimeMillis();
-        delay--;
-        sound--;
+        if(delay)
+            delay--;
+        if(sound)
+        {
+            sound--;
+            audio.Play();
+        }
+
         gamePanel->RefreshScreen();
     }
 
