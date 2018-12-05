@@ -50,7 +50,11 @@ MainFrame::~MainFrame()
 
 void MainFrame::OnOpenROM(wxCommandEvent& event)
 {
-    if(app->cpu->OpenROM("ROM/AIRPLANE.ch8"))
+    wxFileDialog openFileDialog(this, _("Open ROM"), "", "", "Chip 8 ROMs (*.ch8)|*.ch8", wxFD_OPEN | wxFD_FILE_MUST_EXIST);
+    if (openFileDialog.ShowModal() == wxID_CANCEL)
+        return;
+
+    if(app->cpu->OpenROM(openFileDialog.GetPath().ToStdString().data()))
         app->StartGameThread();
     else
         wxMessageBox("Could not open ROM!");
@@ -76,10 +80,15 @@ void MainFrame::OnExit(wxCommandEvent& event)
 
 void MainFrame::OnPause(wxCommandEvent& event)
 {
+    OnPause();
+}
+
+void MainFrame::OnPause()
+{
     if(pause->IsChecked())
-        app->cpu->run = false;
+        app->StopGameThread();
     else
-        app->cpu->run = true;
+        app->StartGameThread();
 }
 
 void MainFrame::OnRebootCore(wxCommandEvent& event)

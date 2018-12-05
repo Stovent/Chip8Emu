@@ -53,7 +53,6 @@ public:
 
     wxLongLong last;
 
-    bool run;
     bool stop;
 
     Chip8(GamePanel* gp);

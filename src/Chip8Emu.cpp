@@ -23,6 +23,7 @@ int Chip8Emu::OnExit()
 
 void Chip8Emu::StartGameThread()
 {
+    cpu->stop = false;
     if(gameThread == nullptr)
         gameThread = new std::thread(runGameThread, this);
 }
@@ -31,6 +32,7 @@ void Chip8Emu::StopGameThread()
 {
     if(gameThread != nullptr)
     {
+        cpu->stop = true;
         if(gameThread->joinable())
             gameThread->join();
         delete gameThread;

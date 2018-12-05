@@ -215,16 +215,17 @@ void GamePanel::OnKeyDown(wxKeyEvent& event)
     break;
 
     case 'A':
-        if(app->cpu->run)
+        if(app->mainFrame->pause->IsChecked())
         {
-            app->cpu->run = false;
-            app->mainFrame->SetStatusText("Pause");
+            app->mainFrame->pause->Check(false);
+            app->mainFrame->SetStatusText("Running");
         }
         else
         {
-            app->cpu->run = true;
-            app->mainFrame->SetStatusText("Running");
+            app->mainFrame->pause->Check(true);
+            app->mainFrame->SetStatusText("Pause");
         }
+        app->mainFrame->OnPause();
     break;
 
     case 'E':

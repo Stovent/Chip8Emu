@@ -24,6 +24,7 @@ public:
     void OnCloseROM(wxCommandEvent& event);
     void OnExit(wxCommandEvent& event);
 
+    void OnPause();
     void OnPause(wxCommandEvent& event);
     void OnRebootCore(wxCommandEvent& event);
     void OnExportMemory(wxCommandEvent& event);

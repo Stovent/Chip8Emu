@@ -7,7 +7,6 @@
 Chip8::Chip8(GamePanel* gp) : audio(46, beep)
 {
     gamePanel = gp;
-    run = true;
     stop = false;
     memory = new uint8_t[4096];
 
@@ -85,7 +84,6 @@ void Chip8::Run()
         if(stop)
             break;
 
-        gamePanel->app->mainFrame->SetStatusText(run ? "Running" : "Pause");
         Execute();
     }
 }
@@ -152,7 +150,6 @@ void Chip8::Reset()
 
 void Chip8::CloseROM()
 {
-    run = false;
     stop = true;
     memset(memory + 512, 0, 3584);
 }
@@ -175,10 +172,7 @@ int8_t Chip8::GetInstruction(uint16_t opcode) const
 void Chip8::Execute()
 {
     if(PC > 4096)
-    {
-        run = false;
         return;
-    }
 
     uint16_t opcode = GetNextOpcode(); PC += 2;
     uint16_t nnn = opcode & 0x0FFF;
