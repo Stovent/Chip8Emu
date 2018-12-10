@@ -27,6 +27,7 @@ public:
     void SetRandom();
     void RefreshScreen();
 
+    void OnWaitEvent(wxKeyEvent& event);
     void OnKeyUp(wxKeyEvent& event);
     void OnKeyDown(wxKeyEvent& event);
 

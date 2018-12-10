@@ -9,6 +9,7 @@ Chip8::Chip8(GamePanel* gp) : audio(46, beep)
     gamePanel = gp;
     stop = false;
     memory = new uint8_t[4096];
+    lastKey = -1;
 
     gp->ClearScreen();
     gp->RefreshScreen();
@@ -302,7 +303,9 @@ void Chip8::Execute()
     break;
 
     case LDVxK:
-        // TODO
+        while(lastKey < 0);
+        V[x] = lastKey;
+        lastKey = -1;
     break;
 
     case LDDTVx:

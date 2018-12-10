@@ -3,6 +3,7 @@
 wxBEGIN_EVENT_TABLE(GamePanel, wxPanel)
     EVT_KEY_UP(GamePanel::OnKeyUp)
     EVT_KEY_DOWN(GamePanel::OnKeyDown)
+    EVT_KEY_DOWN(GamePanel::OnWaitEvent)
 wxEND_EVENT_TABLE()
 
 GamePanel::GamePanel(Chip8Emu* app, MainFrame* parent) : wxPanel(parent)
@@ -70,10 +71,80 @@ void GamePanel::Draw(uint8_t x, uint8_t y, uint8_t n)
         }
     }
 }
-#undef A
+
 void GamePanel::ClearScreen()
 {
     memset(screen, 0, WIDTH * HEIGHT * 3);
+}
+
+void GamePanel::OnWaitEvent(wxKeyEvent& event)
+{
+    switch(event.GetKeyCode())
+    {
+    case WXK_NUMPAD0:
+        app->cpu->lastKey = 0;
+    break;
+
+    case WXK_NUMPAD7:
+        app->cpu->lastKey = 1;
+    break;
+
+    case WXK_NUMPAD8:
+        app->cpu->lastKey = 2;
+    break;
+
+    case WXK_NUMPAD9:
+        app->cpu->lastKey = 3;
+    break;
+
+    case WXK_NUMPAD4:
+        app->cpu->lastKey = 4;
+    break;
+
+    case WXK_NUMPAD5:
+        app->cpu->lastKey = 5;
+    break;
+
+    case WXK_NUMPAD6:
+        app->cpu->lastKey = 6;
+    break;
+
+    case WXK_NUMPAD1:
+        app->cpu->lastKey = 7;
+    break;
+
+    case WXK_NUMPAD2:
+        app->cpu->lastKey = 8;
+    break;
+
+    case WXK_NUMPAD3:
+        app->cpu->lastKey = 9;
+    break;
+
+    case WXK_NUMPAD_DIVIDE:
+        app->cpu->lastKey = 10;
+    break;
+
+    case WXK_NUMPAD_MULTIPLY:
+        app->cpu->lastKey = 11;
+    break;
+
+    case WXK_NUMPAD_SUBTRACT:
+        app->cpu->lastKey = 12;
+    break;
+
+    case WXK_NUMPAD_ADD:
+        app->cpu->lastKey = 13;
+    break;
+
+    case WXK_NUMPAD_ENTER:
+        app->cpu->lastKey = 14;
+    break;
+
+    case WXK_NUMPAD_DECIMAL:
+        app->cpu->lastKey = 15;
+    break;
+    }
 }
 
 void GamePanel::OnKeyUp(wxKeyEvent& event)

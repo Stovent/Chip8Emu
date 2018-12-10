@@ -52,6 +52,7 @@ public:
     bool keys[16];
 
     wxLongLong last;
+    int8_t lastKey;
 
     bool stop;
 
