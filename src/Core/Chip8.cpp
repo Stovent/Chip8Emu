@@ -260,7 +260,7 @@ void Chip8::Execute()
     break;
 
     case SHL:
-        if(V[x] & 0x8000) VF = 1; else VF = 0;
+        if(V[x] & 0x80) VF = 1; else VF = 0;
         V[x] <<= 1;
     break;
 
