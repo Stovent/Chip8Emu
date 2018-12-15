@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <cstdio>
 
-Chip8::Chip8(GamePanel* gp) : audio(46, beep)
+Chip8::Chip8(GamePanel* gp) : audio(76, beep)
 {
     gamePanel = gp;
     stop = false;
@@ -15,7 +15,6 @@ Chip8::Chip8(GamePanel* gp) : audio(46, beep)
     gp->RefreshScreen();
     Init();
 
-    { // those brackets are just to be able to collapse it
     instructions[CLS].opcode = 0x00E0;  instructions[CLS].mask = 0xFFFF;     /* 00E0 */
     instructions[RET].opcode = 0x00EE;  instructions[RET].mask = 0xFFFF;     /* 00EE */
     instructions[JPaddr].opcode = 0x1000;  instructions[JPaddr].mask = 0xF000;     /* 1NNN */
@@ -50,7 +49,6 @@ Chip8::Chip8(GamePanel* gp) : audio(46, beep)
     instructions[LDBVx].opcode = 0xF033; instructions[LDBVx].mask = 0xF0FF;    /* FX33 */
     instructions[LDIVx].opcode = 0xF055; instructions[LDIVx].mask = 0xF0FF;    /* FX55 */
     instructions[LDVxI].opcode = 0xF065; instructions[LDVxI].mask = 0xF0FF;    /* FX65 */
-    }
 }
 
 Chip8::~Chip8()

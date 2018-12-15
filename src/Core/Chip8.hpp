@@ -22,11 +22,11 @@ class Chip8
 {
     GamePanel* gamePanel;
     Instruction instructions[35];
-    unsigned char beep[46] {0x52, 0x49, 0x46, 0x46, // RIFF
-                38, 0, 0, 0, // file size
+    unsigned char beep[76] {0x52, 0x49, 0x46, 0x46, // RIFF
+                0x3C, 0, 0, 0, // file size
                 0x57, 0x41, 0x56, 0x45, // WAVE
                 0x66, 0x6D, 0x74, 0x20,// fmt
-                16, 0, 0, 0, // bloc size
+                0x10, 0, 0, 0, // bloc size
                 1, 0, // PCM
                 1, 0, // Mono
                 0x44, 0xAC, 0, 0, // 44100 Hz
@@ -34,8 +34,8 @@ class Chip8
                 1, 0,
                 8, 0,
                 0x64, 0x61, 0x74, 0x61, // data
-                2, 0, 0, 0, // data size
-                255, 0
+                0x20, 0, 0, 0, // data size
+                128, 0, 128, 0, 128, 0, 128, 0, 128, 0, 128, 0, 128, 0, 128, 0, 128, 0, 128, 0, 128, 0, 128, 0, 128, 0, 128, 0, 128, 0, 128, 0
     };
 
     wxSound audio;
