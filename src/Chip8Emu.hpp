@@ -10,12 +10,10 @@ class Chip8Emu;
 #include "Core/Chip8.hpp"
 #include "GUI/MainFrame.hpp"
 
-void runGameThread(Chip8Emu* app);
-
 class Chip8Emu : public wxApp
 {
 public:
-    std::thread* gameThread = nullptr;
+    std::thread* gameThread;
 
     Chip8* cpu;
 

@@ -14,7 +14,7 @@ class MainFrame : public wxFrame
 
 public:
     GamePanel* gamePanel;
-    wxMenuItem* pause;
+    wxMenuItem* pauseMenuItem;
 
     MainFrame(Chip8Emu* app, const wxString& title, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize);
     ~MainFrame();

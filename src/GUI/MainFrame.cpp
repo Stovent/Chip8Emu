@@ -28,7 +28,7 @@ MainFrame::MainFrame(Chip8Emu* app, const wxString& title, const wxPoint& pos, c
     fileMenu->Append(idOnExit, "Quit\tAlt+f4");
 
     wxMenu* emuMenu = new wxMenu;
-    pause = emuMenu->AppendCheckItem(idOnPause, "Pause");
+    pauseMenuItem = emuMenu->AppendCheckItem(idOnPause, "Pause");
     emuMenu->AppendSeparator();
     emuMenu->Append(idOnRebootCore, "Reboot Core\tCtrl+B");
     emuMenu->Append(idOnExportMemory, "Export Memory\tCtrl+M");
@@ -85,10 +85,10 @@ void MainFrame::OnPause(wxCommandEvent& event)
 
 void MainFrame::OnPause()
 {
-    if(pause->IsChecked())
-        app->StopGameThread();
+    if(pauseMenuItem->IsChecked())
+        app->cpu->exec = false;
     else
-        app->StartGameThread();
+        app->cpu->exec = true;
 }
 
 void MainFrame::OnRebootCore(wxCommandEvent& event)

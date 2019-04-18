@@ -50,24 +50,29 @@ public:
     uint8_t sound;
     uint8_t delay;
     bool keys[16];
+    bool romOpened;
 
-    wxLongLong last;
+    uint32_t clockFrequency;
+    long double clockInterval;
+    uint32_t instructionCount;
     int8_t lastKey;
 
-    bool stop;
+    bool run;
+    bool exec;
 
-    Chip8(GamePanel* gp);
+    Chip8(GamePanel* gp, uint32_t frequency);
     ~Chip8();
     void Run();
     bool Init();
-    void Pause(bool val = false);
     void Execute();
+    void WaitKey(uint8_t x);
 
     void ExportMemory();
 
     void LoadFont();
     bool OpenROM(const char* file);
     void Reset();
+    void ResetMemory();
     void CloseROM();
 
     uint16_t GetNextOpcode();

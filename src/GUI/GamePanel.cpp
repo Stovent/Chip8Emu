@@ -3,7 +3,6 @@
 wxBEGIN_EVENT_TABLE(GamePanel, wxPanel)
     EVT_KEY_UP(GamePanel::OnKeyUp)
     EVT_KEY_DOWN(GamePanel::OnKeyDown)
-    EVT_KEY_DOWN(GamePanel::OnWaitEvent)
 wxEND_EVENT_TABLE()
 
 GamePanel::GamePanel(Chip8Emu* app, MainFrame* parent) : wxPanel(parent)
@@ -79,6 +78,7 @@ void GamePanel::ClearScreen()
 
 void GamePanel::OnWaitEvent(wxKeyEvent& event)
 {
+    app->cpu->lastKey = -1;
     switch(event.GetKeyCode())
     {
     case WXK_NUMPAD0:
@@ -219,6 +219,7 @@ void GamePanel::OnKeyUp(wxKeyEvent& event)
 
 void GamePanel::OnKeyDown(wxKeyEvent& event)
 {
+    OnWaitEvent(event);
     switch(event.GetKeyCode())
     {
     case WXK_NUMPAD0:
@@ -286,21 +287,22 @@ void GamePanel::OnKeyDown(wxKeyEvent& event)
     break;
 
     case 'A':
-        if(app->mainFrame->pause->IsChecked())
+        if(app->mainFrame->pauseMenuItem->IsChecked())
         {
-            app->mainFrame->pause->Check(false);
+            app->mainFrame->pauseMenuItem->Check(false);
             app->mainFrame->SetStatusText("Running");
         }
         else
         {
-            app->mainFrame->pause->Check(true);
+            app->mainFrame->pauseMenuItem->Check(true);
             app->mainFrame->SetStatusText("Pause");
         }
         app->mainFrame->OnPause();
     break;
 
     case 'E':
-        app->cpu->Execute();
+        if(app->mainFrame->pauseMenuItem->IsChecked() && app->cpu->romOpened)
+            app->cpu->Execute();
     break;
     }
 }

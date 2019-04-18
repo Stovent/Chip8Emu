@@ -3,13 +3,18 @@
 #include <cstring>
 #include <cstdlib>
 #include <cstdio>
+#include <chrono>
+#include <ratio>
 
-Chip8::Chip8(GamePanel* gp) : audio(76, beep)
+Chip8::Chip8(GamePanel* gp, uint32_t frequency) : audio(76, beep)
 {
     gamePanel = gp;
-    stop = false;
+    exec = run = true;
     memory = new uint8_t[4096];
     lastKey = -1;
+    romOpened = false;
+    clockFrequency = frequency;
+    clockInterval = (1/(long double)frequency) * 1000000.0;
 
     gp->ClearScreen();
     gp->RefreshScreen();
@@ -78,13 +83,11 @@ void Chip8::ExportMemory()
 
 void Chip8::Run()
 {
-    while(true)
-    {
-        if(stop)
-            break;
-
-        Execute();
-    }
+    while(run)
+        if(exec)
+            Execute();
+        else
+            wxMilliSleep(20);
 }
 
 void Chip8::LoadFont()
@@ -111,27 +114,24 @@ bool Chip8::OpenROM(const char* file)
 {
     FILE* f = fopen(file, "rb");
     if(f == NULL)
-        return false;
-
-    Init();
+        return romOpened = false;
 
     fseek(f, 0, SEEK_END);
     long size = ftell(f);
     fseek(f, 0, SEEK_SET);
 
-    char* c = new char[size];
-    fread(c, 1, size, f);
-    memcpy(&memory[512], c, size);
+    fread(&memory[512], 1, size, f);
 
     fclose(f);
-    stop = false;
-    return true;
+
+    Reset();
+    return romOpened = run = true;
 }
 
 void Chip8::Reset()
 {
-    last = wxGetLocalTimeMillis();
     gamePanel->ClearScreen();
+    instructionCount = 0;
 
     sound = 0;
     delay = 0;
@@ -139,7 +139,7 @@ void Chip8::Reset()
     SP = 0;
     I = 0;
 
-    for(int i = 0; i < 16; i++)
+    for(uint8_t i = 0; i < 16; i++)
     {
         V[i] = 0;
         stack[i] = 0;
@@ -147,10 +147,15 @@ void Chip8::Reset()
     }
 }
 
+void Chip8::ResetMemory()
+{
+    memset(memory, 0, 4096);
+}
+
 void Chip8::CloseROM()
 {
-    stop = true;
-    memset(memory + 512, 0, 3584);
+    romOpened = run = false;
+    memset(&memory[512], 0, 3584);
 }
 
 uint16_t Chip8::GetNextOpcode()
@@ -168,8 +173,21 @@ int8_t Chip8::GetInstruction(uint16_t opcode) const
     return -1;
 }
 
+void Chip8::WaitKey(uint8_t x)
+{
+    while(lastKey < 0)
+    {
+        FILE* f = fopen("wait", "a+");
+        fputs("YAY!\n", f);
+        fclose(f);
+    }
+    V[x] = lastKey;
+    lastKey = -1;
+}
+
 void Chip8::Execute()
 {
+    std::chrono::time_point<std::chrono::steady_clock, std::chrono::nanoseconds> t1 = std::chrono::steady_clock::now();
     if(PC > 4096)
         return;
 
@@ -182,176 +200,177 @@ void Chip8::Execute()
 
     switch(GetInstruction(opcode))
     {
-
     case CLS:
         gamePanel->ClearScreen();
-    break;
+        break;
 
     case RET:
         PC = stack[--SP];
-    break;
+        break;
 
     case JPaddr:
         PC = nnn;
-    break;
+        break;
 
     case CALL:
         stack[SP++] = PC;
         PC = nnn;
-    break;
+        break;
 
     case SEVxByte:
         if(V[x] == nn)
             PC += 2;
-    break;
+        break;
 
     case SNEVxByte:
         if(V[x] != nn)
             PC += 2;
-    break;
+        break;
 
     case SEVxVy:
         if(V[x] == V[y])
             PC += 2;
-    break;
+        break;
 
     case LDVxByte:
         V[x] = nn;
-    break;
+        break;
 
     case ADDVxByte:
         V[x] += nn;
-    break;
+        break;
 
     case LDVxVy:
         V[x] = V[y];
-    break;
+        break;
 
     case OR:
         V[x] |= V[y];
-    break;
+        break;
 
     case AND:
         V[x] &= V[y];
-    break;
+        break;
 
     case XOR:
         V[x] ^= V[y];
-    break;
+        break;
 
     case ADDVxVy:
         if(V[x] + V[y] > 255) VF = 1; else VF = 0;
         V[x] += V[y];
-    break;
+        break;
 
     case SUB:
         if(V[x] > V[y]) VF = 1; else VF = 0; // NOT Borrow
         V[x] -= V[y];
-    break;
+        break;
 
     case SHR:
         if(V[x] & 1) VF = 1; else VF = 0;
         V[x] >>= 1;
-    break;
+        break;
 
     case SUBN:
         if(V[y] > V[x]) VF = 1; else VF = 0; // NOT Borrow
         V[x] = V[y] - V[x];
-    break;
+        break;
 
     case SHL:
         if(V[x] & 0x80) VF = 1; else VF = 0;
         V[x] <<= 1;
-    break;
+        break;
 
     case SNEVxVy:
         if(V[x] != V[y])
             PC += 2;
-    break;
+        break;
 
     case LDIaddr:
         I = nnn;
-    break;
+        break;
 
     case JPV0addr:
         PC = V[0] + nnn;
-    break;
+        break;
 
     case RND:
         srand(time(0));
         V[x] = (rand() % 256) & nn;
-    break;
+        break;
 
     case DRW:
         gamePanel->Draw(x, y, n);
-    break;
+        gamePanel->RefreshScreen();
+        break;
 
     case SKP:
         if(keys[V[x]])
             PC += 2;
-    break;
+        break;
 
     case SKNP:
         if(!keys[V[x]])
             PC += 2;
-    break;
+        break;
 
     case LDVxDT:
         V[x] = delay;
-    break;
+        break;
 
-    case LDVxK:
-        while(lastKey < 0);
-        V[x] = lastKey;
-        lastKey = -1;
-    break;
+    case LDVxK: // BLITZ
+        WaitKey(x);
+        break;
 
     case LDDTVx:
         delay = V[x];
-    break;
+        break;
 
     case LDSTVx:
         sound = V[x];
-    break;
+        break;
 
     case ADDIVx:
         I += V[x];
-    break;
+        break;
 
     case LDFVx:
         I = V[x] * 5;
-    break;
+        break;
 
     case LDBVx:
         memory[I] = V[x] / 100;
         memory[I+1] = (V[x] - memory[I] * 100) / 10;
         memory[I+2] = (V[x] - memory[I] * 100) - memory[I+1] * 10;
-    break;
+        break;
 
     case LDIVx:
         for(uint8_t i = 0; i <= x; i++)
             memory[I + i] = V[i];
-    break;
+        break;
 
     case LDVxI:
         for(uint8_t i = 0; i <= x; i++)
             V[i] = memory[I + i];
-    break;
+        break;
     }
 
-    if(wxGetLocalTimeMillis() - last > 16)
+    if(++instructionCount > clockFrequency / 60.0)
     {
-        last = wxGetLocalTimeMillis();
+        instructionCount = 0;
+
         if(delay)
             delay--;
+
         if(sound)
         {
             sound--;
             audio.Play();
         }
-
-        gamePanel->RefreshScreen();
     }
 
-    wxMicroSleep(1000);
+    std::chrono::duration<unsigned long long, std::ratio<1, 1000000000>> time = std::chrono::steady_clock::now() - t1;
+    long double wait = clockInterval - time.count()/1000.0;
+    if(wait > 0.0)
+        wxMicroSleep(wait);
 }
