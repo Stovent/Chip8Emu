@@ -112,6 +112,7 @@ void Chip8::LoadFont()
 
 bool Chip8::OpenROM(const char* file)
 {
+    ResetMemory();
     FILE* f = fopen(file, "rb");
     if(f == NULL)
         return romOpened = false;
@@ -149,13 +150,13 @@ void Chip8::Reset()
 
 void Chip8::ResetMemory()
 {
-    memset(memory, 0, 4096);
+    memset(&memory[512], 0, 3584);
 }
 
 void Chip8::CloseROM()
 {
     romOpened = run = false;
-    memset(&memory[512], 0, 3584);
+    ResetMemory();
 }
 
 uint16_t Chip8::GetNextOpcode()
