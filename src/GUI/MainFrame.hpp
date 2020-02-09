@@ -4,43 +4,36 @@
 class MainFrame;
 
 #include <wx/frame.h>
+#include <wx/msgdlg.h>
 
-#include "../Chip8Emu.hpp"
 #include "GamePanel.hpp"
+#include "../Chip8Emu.hpp"
+
+enum
+{
+    IDOnOpenROM = wxID_HIGHEST + 1,
+    IDOnCloseROM,
+    IDOnPause,
+    IDOnQuit,
+};
 
 class MainFrame : public wxFrame
 {
-    Chip8Emu* app;
-
 public:
+    Chip8Emu* chip8Emu;
     GamePanel* gamePanel;
     wxMenuItem* pauseMenuItem;
 
     MainFrame(Chip8Emu* app, const wxString& title, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize);
-    ~MainFrame();
 
-    void OnOpenROM(wxCommandEvent& event);
-    void OnReloadROM(wxCommandEvent& event);
-    void OnCloseROM(wxCommandEvent& event);
-    void OnExit(wxCommandEvent& event);
+    void OnOpenROM(wxCommandEvent&);
+    void OnCloseROM(wxCommandEvent&);
+    void OnPause(wxCommandEvent&);
+    void OnQuit(wxCommandEvent&);
 
-    void OnPause();
-    void OnPause(wxCommandEvent& event);
-    void OnRebootCore(wxCommandEvent& event);
-    void OnExportMemory(wxCommandEvent& event);
+    void TooglePause();
 
     wxDECLARE_EVENT_TABLE();
-};
-
-enum
-{
-    idOnOpenROM = wxID_HIGHEST + 1,
-    idOnReloadROM,
-    idOnCloseROM,
-    idOnExit,
-    idOnPause,
-    idOnRebootCore,
-    idOnExportMemory,
 };
 
 #endif // MAINFRAME_HPP

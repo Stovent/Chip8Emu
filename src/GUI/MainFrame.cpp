@@ -2,101 +2,83 @@
 
 #include <wx/sizer.h>
 #include <wx/menu.h>
+#include <wx/filedlg.h>
 
 wxBEGIN_EVENT_TABLE(MainFrame, wxFrame)
-    EVT_MENU(idOnOpenROM, MainFrame::OnOpenROM)
-    EVT_MENU(idOnReloadROM, MainFrame::OnReloadROM)
-    EVT_MENU(idOnCloseROM, MainFrame::OnCloseROM)
-    EVT_MENU(idOnExit, MainFrame::OnExit)
-    EVT_MENU(idOnPause, MainFrame::OnPause)
-    EVT_MENU(idOnRebootCore, MainFrame::OnRebootCore)
-    EVT_MENU(idOnExportMemory, MainFrame::OnExportMemory)
+    EVT_MENU(IDOnOpenROM,  MainFrame::OnOpenROM)
+    EVT_MENU(IDOnCloseROM, MainFrame::OnCloseROM)
+    EVT_MENU(IDOnPause,    MainFrame::OnPause)
+    EVT_MENU(IDOnQuit,     MainFrame::OnQuit)
 wxEND_EVENT_TABLE()
 
 MainFrame::MainFrame(Chip8Emu* app, const wxString& title, const wxPoint& pos, const wxSize& size) : wxFrame(nullptr, wxID_ANY, title, pos, size)
 {
-    this->app = app;
-    gamePanel = new GamePanel(app, this);
+    chip8Emu = app;
+    gamePanel = new GamePanel(this, chip8Emu->chip8);
+
     wxBoxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
     sizer->Add(gamePanel, 1, wxEXPAND);
     SetSizer(sizer);
 
     wxMenu* fileMenu = new wxMenu();
-    fileMenu->Append(idOnOpenROM, "Open ROM\tCtrl+O");
-    fileMenu->Append(idOnReloadROM, "Reload ROM\tCtrl+R");
-    fileMenu->Append(idOnCloseROM, "Close ROM\tCtrl+Q");
-    fileMenu->Append(idOnExit, "Quit\tAlt+f4");
+    fileMenu->Append(IDOnOpenROM, "Open ROM\tCtrl+O");
+    fileMenu->Append(IDOnCloseROM, "Close ROM\tCtrl+C");
+    fileMenu->Append(IDOnQuit, "Quit\tAlt+f4");
 
-    wxMenu* emuMenu = new wxMenu;
-    pauseMenuItem = emuMenu->AppendCheckItem(idOnPause, "Pause");
-    emuMenu->AppendSeparator();
-    emuMenu->Append(idOnRebootCore, "Reboot Core\tCtrl+B");
-    emuMenu->Append(idOnExportMemory, "Export Memory\tCtrl+M");
+    wxMenu* emulationMenu = new wxMenu();
+    pauseMenuItem = emulationMenu->AppendCheckItem(IDOnPause, "Pause");
 
-    wxMenuBar* bar = new wxMenuBar();
-    bar->Append(fileMenu, "File");
-    bar->Append(emuMenu, "Emulation");
+    wxMenuBar* menuBar = new wxMenuBar();
+    menuBar->Append(fileMenu, "File");
+    menuBar->Append(emulationMenu, "Emulation");
 
-    SetMenuBar(bar);
-    CreateStatusBar();
-    SetAutoLayout(true);
+    SetMenuBar(menuBar);
     Show();
 }
 
-MainFrame::~MainFrame()
-{
-    delete gamePanel;
-}
-
-void MainFrame::OnOpenROM(wxCommandEvent& event)
+void MainFrame::OnOpenROM(wxCommandEvent&)
 {
     wxFileDialog openFileDialog(this, _("Open ROM"), "", "", "Chip 8 ROMs (*.ch8)|*.ch8", wxFD_OPEN | wxFD_FILE_MUST_EXIST);
     if (openFileDialog.ShowModal() == wxID_CANCEL)
         return;
 
-    if(app->cpu->OpenROM(openFileDialog.GetPath().ToStdString().data()))
-        app->StartGameThread();
+    if(chip8Emu->chip8->OpenROM(openFileDialog.GetPath().ToStdString()))
+    {
+        if(!pauseMenuItem->IsChecked())
+            chip8Emu->StartGameThread();
+    }
     else
         wxMessageBox("Could not open ROM!");
 }
 
-void MainFrame::OnReloadROM(wxCommandEvent& event)
+void MainFrame::OnCloseROM(wxCommandEvent&)
 {
-    app->cpu->Reset();
+    chip8Emu->chip8->CloseROM();
 }
 
-void MainFrame::OnCloseROM(wxCommandEvent& event)
+void MainFrame::OnPause(wxCommandEvent&)
 {
-    app->cpu->CloseROM();
-    app->StopGameThread();
-    gamePanel->ClearScreen();
-    gamePanel->RefreshScreen();
+    TooglePause();
 }
 
-void MainFrame::OnExit(wxCommandEvent& event)
+void MainFrame::OnQuit(wxCommandEvent&)
 {
     Close(true);
 }
 
-void MainFrame::OnPause(wxCommandEvent& event)
+void MainFrame::TooglePause()
 {
-    OnPause();
-}
-
-void MainFrame::OnPause()
-{
-    if(pauseMenuItem->IsChecked())
-        app->cpu->exec = false;
-    else
-        app->cpu->exec = true;
-}
-
-void MainFrame::OnRebootCore(wxCommandEvent& event)
-{
-    app->cpu->Init();
-}
-
-void MainFrame::OnExportMemory(wxCommandEvent& event)
-{
-    app->cpu->ExportMemory();
+    if(chip8Emu->chip8->romOpened)
+    {
+        if(chip8Emu->chip8->run)
+        {
+            chip8Emu->StopGameThread();
+            pauseMenuItem->Check();
+        }
+        else
+        {
+            chip8Emu->StartGameThread();
+            pauseMenuItem->Check(false);
+        }
+    }
 }

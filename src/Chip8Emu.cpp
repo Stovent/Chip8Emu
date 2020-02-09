@@ -2,27 +2,25 @@
 
 bool Chip8Emu::OnInit()
 {
+    chip8 = new Chip8(500);
+    mainFrame = new MainFrame(this, "Chip8Emu", wxPoint(50, 50), wxSize(400, 300));
     gameThread = nullptr;
-    mainFrame = new MainFrame(this, "Chip8Emu", wxPoint(50, 50), wxSize(660, 410));
-    if(mainFrame == nullptr)
-        return false;
-
-    cpu = new Chip8(mainFrame->gamePanel, 1000);
-
     return true;
 }
 
 int Chip8Emu::OnExit()
 {
+    StopGameThread();
     return 1;
 }
 
 void Chip8Emu::StartGameThread()
 {
-    if(gameThread == nullptr && cpu->romOpened)
+    StopGameThread();
+    if(chip8->romOpened)
     {
-        cpu->run = true;
-        gameThread = new std::thread(&Chip8::Run, cpu);
+        chip8->run = true;
+        gameThread = new std::thread(&Chip8::Run, chip8);
     }
 }
 
@@ -30,7 +28,7 @@ void Chip8Emu::StopGameThread()
 {
     if(gameThread == nullptr)
         return;
-    cpu->run = false;
+    chip8->run = false;
     if(gameThread->joinable())
         gameThread->join();
     delete gameThread;

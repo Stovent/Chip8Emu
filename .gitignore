@@ -1,6 +1,6 @@
 /*
 
 !.gitignore
-!Makefile
+!CMakeLists.txt
 
 !/src

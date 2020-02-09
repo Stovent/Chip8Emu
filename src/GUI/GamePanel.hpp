@@ -3,40 +3,29 @@
 
 class GamePanel;
 
+#include <wx/dcclient.h>
 #include <wx/panel.h>
 #include <wx/timer.h>
-#include <wx/dcclient.h>
 
 #include "MainFrame.hpp"
-#include "../Chip8Emu.hpp"
-
-#define WIDTH 64
-#define HEIGHT 32
+#include "../Core/Chip8.hpp"
 
 class GamePanel : public wxPanel
 {
-    unsigned char screen[WIDTH*HEIGHT*3];
+    Chip8* chip8;
+    wxTimer timer;
+    wxImage screen;
 
 public:
-    Chip8Emu* app;
+    GamePanel(MainFrame* parent, Chip8* cpu);
 
-    GamePanel(Chip8Emu* app, MainFrame* parent);
-    ~GamePanel();
-    void Draw(uint8_t x, uint8_t y, uint8_t n);
-    void ClearScreen();
-    void SetRandom();
-    void RefreshScreen();
-
-    void OnWaitEvent(wxKeyEvent& event);
-    void OnKeyUp(wxKeyEvent& event);
+    void DrawScreen(wxDC& dc);
     void OnKeyDown(wxKeyEvent& event);
+    void OnKeyUp(wxKeyEvent& event);
+    void OnTimer(wxTimerEvent&);
+    void PaintEvent(wxPaintEvent&);
 
     wxDECLARE_EVENT_TABLE();
-};
-
-enum
-{
-    idOnTimer = wxID_LAST,
 };
 
 #endif // GAMEPANEL_HPP

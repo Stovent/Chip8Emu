@@ -1,308 +1,187 @@
 #include "GamePanel.hpp"
 
 wxBEGIN_EVENT_TABLE(GamePanel, wxPanel)
-    EVT_KEY_UP(GamePanel::OnKeyUp)
     EVT_KEY_DOWN(GamePanel::OnKeyDown)
+    EVT_KEY_UP(GamePanel::OnKeyUp)
+    EVT_TIMER(wxID_ANY, GamePanel::OnTimer)
+    EVT_PAINT(GamePanel::PaintEvent)
 wxEND_EVENT_TABLE()
 
-GamePanel::GamePanel(Chip8Emu* app, MainFrame* parent) : wxPanel(parent)
+GamePanel::GamePanel(MainFrame* parent, Chip8* cpu) : wxPanel(parent), timer(this), screen(WIDTH, HEIGHT)
 {
-    this->app = app;
-    memset(screen, 0, WIDTH*HEIGHT*3);
+    chip8 = cpu;
+    timer.Start(16);
 }
 
-GamePanel::~GamePanel()
+void GamePanel::DrawScreen(wxDC& dc)
 {
-
+    screen.SetData(chip8->screen, true);
+    dc.DrawBitmap(wxBitmap(screen.Scale(GetSize().x, GetSize().y, wxIMAGE_QUALITY_NEAREST)), 0, 0);
 }
 
-void GamePanel::SetRandom()
+void GamePanel::OnKeyDown(wxKeyEvent& event)
 {
-    srand(time(0));
-    for(int i = 0; i < WIDTH*HEIGHT*3; i+=3)
-        if(rand() % 2)
-        {
-            screen[i] = 255;
-            screen[i+1] = 255;
-            screen[i+2] = 255;
-        }
-        else
-        {
-            screen[i] = 0;
-            screen[i+1] = 0;
-            screen[i+2] = 0;
-        }
-}
-
-void GamePanel::RefreshScreen()
-{
-    wxClientDC dc(this);
-    wxBitmap bitmap(wxImage(WIDTH, HEIGHT, screen, true).Scale(app->mainFrame->GetClientSize().x, app->mainFrame->GetClientSize().y, wxIMAGE_QUALITY_NEAREST));
-    dc.DrawBitmap(bitmap, 0, 0);
-}
-
-void GamePanel::Draw(uint8_t x, uint8_t y, uint8_t n)
-{
-    uint8_t ligne;
-
-    for(int j = 0; j < n; j++)
+    const int key = event.GetKeyCode();
+    if(key == WXK_NUMPAD0)
     {
-        ligne = app->cpu->memory[app->cpu->I + j];
-
-        for(int i = 0; i < 8; i++)
-        {
-            if(ligne & (0x80 >> i))
-            {
-                if(screen[(app->cpu->V[y] + j) * 3 * WIDTH + (app->cpu->V[x] + i) * 3])
-                {
-                    screen[(app->cpu->V[y] + j) * 3 * WIDTH + (app->cpu->V[x] + i) * 3] = 0;
-                    screen[(app->cpu->V[y] + j) * 3 * WIDTH + (app->cpu->V[x] + i) * 3 + 1] = 0;
-                    screen[(app->cpu->V[y] + j) * 3 * WIDTH + (app->cpu->V[x] + i) * 3 + 2] = 0;
-                    app->cpu->VF = 1;
-                }
-                else
-                {
-                    screen[(app->cpu->V[y] + j) * 3 * WIDTH + (app->cpu->V[x] + i) * 3] = 255;
-                    screen[(app->cpu->V[y] + j) * 3 * WIDTH + (app->cpu->V[x] + i) * 3 + 1] = 255;
-                    screen[(app->cpu->V[y] + j) * 3 * WIDTH + (app->cpu->V[x] + i) * 3 + 2] = 255;
-                }
-            }
-        }
+        chip8->lastKey = 0;
+        chip8->keys[0] = 1;
     }
-}
-
-void GamePanel::ClearScreen()
-{
-    memset(screen, 0, WIDTH * HEIGHT * 3);
-}
-
-void GamePanel::OnWaitEvent(wxKeyEvent& event)
-{
-    app->cpu->lastKey = -1;
-    switch(event.GetKeyCode())
+    else if(key == WXK_NUMPAD7)
     {
-    case WXK_NUMPAD0:
-        app->cpu->lastKey = 0;
-    break;
-
-    case WXK_NUMPAD7:
-        app->cpu->lastKey = 1;
-    break;
-
-    case WXK_NUMPAD8:
-        app->cpu->lastKey = 2;
-    break;
-
-    case WXK_NUMPAD9:
-        app->cpu->lastKey = 3;
-    break;
-
-    case WXK_NUMPAD4:
-        app->cpu->lastKey = 4;
-    break;
-
-    case WXK_NUMPAD5:
-        app->cpu->lastKey = 5;
-    break;
-
-    case WXK_NUMPAD6:
-        app->cpu->lastKey = 6;
-    break;
-
-    case WXK_NUMPAD1:
-        app->cpu->lastKey = 7;
-    break;
-
-    case WXK_NUMPAD2:
-        app->cpu->lastKey = 8;
-    break;
-
-    case WXK_NUMPAD3:
-        app->cpu->lastKey = 9;
-    break;
-
-    case WXK_NUMPAD_DIVIDE:
-        app->cpu->lastKey = 10;
-    break;
-
-    case WXK_NUMPAD_MULTIPLY:
-        app->cpu->lastKey = 11;
-    break;
-
-    case WXK_NUMPAD_SUBTRACT:
-        app->cpu->lastKey = 12;
-    break;
-
-    case WXK_NUMPAD_ADD:
-        app->cpu->lastKey = 13;
-    break;
-
-    case WXK_NUMPAD_ENTER:
-        app->cpu->lastKey = 14;
-    break;
-
-    case WXK_NUMPAD_DECIMAL:
-        app->cpu->lastKey = 15;
-    break;
+        chip8->lastKey = 1;
+        chip8->keys[1] = 1;
+    }
+    else if(key == WXK_NUMPAD8)
+    {
+        chip8->lastKey = 2;
+        chip8->keys[2] = 1;
+    }
+    else if(key == WXK_NUMPAD9)
+    {
+        chip8->lastKey = 3;
+        chip8->keys[3] = 1;
+    }
+    else if(key == WXK_NUMPAD4)
+    {
+        chip8->lastKey = 4;
+        chip8->keys[4] = 1;
+    }
+    else if(key == WXK_NUMPAD5)
+    {
+        chip8->lastKey = 5;
+        chip8->keys[5] = 1;
+    }
+    else if(key == WXK_NUMPAD6)
+    {
+        chip8->lastKey = 6;
+        chip8->keys[6] = 1;
+    }
+    else if(key == WXK_NUMPAD1)
+    {
+        chip8->lastKey = 7;
+        chip8->keys[7] = 1;
+    }
+    else if(key == WXK_NUMPAD2)
+    {
+        chip8->lastKey = 8;
+        chip8->keys[8] = 1;
+    }
+    else if(key == WXK_NUMPAD3)
+    {
+        chip8->lastKey = 9;
+        chip8->keys[9] = 1;
+    }
+    else if(key == WXK_NUMPAD_DECIMAL)
+    {
+        chip8->lastKey = 10;
+        chip8->keys[10] = 1;
+    }
+    else if(key == WXK_NUMPAD_DIVIDE)
+    {
+        chip8->lastKey = 11;
+        chip8->keys[11] = 1;
+    }
+    else if(key == WXK_NUMPAD_MULTIPLY)
+    {
+        chip8->lastKey = 12;
+        chip8->keys[12] = 1;
+    }
+    else if(key == WXK_NUMPAD_SUBTRACT)
+    {
+        chip8->lastKey = 13;
+        chip8->keys[13] = 1;
+    }
+    else if(key == WXK_NUMPAD_ADD)
+    {
+        chip8->lastKey = 14;
+        chip8->keys[14] = 1;
+    }
+    else if(key == 70)
+    {
+        chip8->lastKey = 15;
+        chip8->keys[15] = 1;
+//        wxMessageBox("F");
     }
 }
 
 void GamePanel::OnKeyUp(wxKeyEvent& event)
 {
-    switch(event.GetKeyCode())
+    const int key = event.GetKeyCode();
+    if(key == WXK_NUMPAD0)
     {
-    case WXK_NUMPAD0:
-        app->cpu->keys[0] = 0;
-    break;
-
-    case WXK_NUMPAD7:
-        app->cpu->keys[1] = 0;
-    break;
-
-    case WXK_NUMPAD8:
-        app->cpu->keys[2] = 0;
-    break;
-
-    case WXK_NUMPAD9:
-        app->cpu->keys[3] = 0;
-    break;
-
-    case WXK_NUMPAD4:
-        app->cpu->keys[4] = 0;
-    break;
-
-    case WXK_NUMPAD5:
-        app->cpu->keys[5] = 0;
-    break;
-
-    case WXK_NUMPAD6:
-        app->cpu->keys[6] = 0;
-    break;
-
-    case WXK_NUMPAD1:
-        app->cpu->keys[7] = 0;
-    break;
-
-    case WXK_NUMPAD2:
-        app->cpu->keys[8] = 0;
-    break;
-
-    case WXK_NUMPAD3:
-        app->cpu->keys[9] = 0;
-    break;
-
-    case WXK_NUMPAD_DIVIDE:
-        app->cpu->keys[10] = 0;
-    break;
-
-    case WXK_NUMPAD_MULTIPLY:
-        app->cpu->keys[11] = 0;
-    break;
-
-    case WXK_NUMPAD_SUBTRACT:
-        app->cpu->keys[12] = 0;
-    break;
-
-    case WXK_NUMPAD_ADD:
-        app->cpu->keys[13] = 0;
-    break;
-
-    case WXK_NUMPAD_ENTER:
-        app->cpu->keys[14] = 0;
-    break;
-
-    case WXK_NUMPAD_DECIMAL:
-        app->cpu->keys[15] = 0;
-    break;
+        chip8->keys[0] = 0;
+    }
+    else if(key == WXK_NUMPAD7)
+    {
+        chip8->keys[1] = 0;
+    }
+    else if(key == WXK_NUMPAD8)
+    {
+        chip8->keys[2] = 0;
+    }
+    else if(key == WXK_NUMPAD9)
+    {
+        chip8->keys[3] = 0;
+    }
+    else if(key == WXK_NUMPAD4)
+    {
+        chip8->keys[4] = 0;
+    }
+    else if(key == WXK_NUMPAD5)
+    {
+        chip8->keys[5] = 0;
+    }
+    else if(key == WXK_NUMPAD6)
+    {
+        chip8->keys[6] = 0;
+    }
+    else if(key == WXK_NUMPAD1)
+    {
+        chip8->keys[7] = 0;
+    }
+    else if(key == WXK_NUMPAD2)
+    {
+        chip8->keys[8] = 0;
+    }
+    else if(key == WXK_NUMPAD3)
+    {
+        chip8->keys[9] = 0;
+    }
+    else if(key == WXK_NUMPAD_DECIMAL)
+    {
+        chip8->keys[10] = 0;
+    }
+    else if(key == WXK_NUMPAD_DIVIDE)
+    {
+        chip8->keys[11] = 0;
+    }
+    else if(key == WXK_NUMPAD_MULTIPLY)
+    {
+        chip8->keys[12] = 0;
+    }
+    else if(key == WXK_NUMPAD_SUBTRACT)
+    {
+        chip8->keys[13] = 0;
+    }
+    else if(key == WXK_NUMPAD_ADD)
+    {
+        chip8->keys[14] = 0;
+    }
+    else if(key == 70)
+    {
+        chip8->keys[15] = 0;
     }
 }
 
-void GamePanel::OnKeyDown(wxKeyEvent& event)
+void GamePanel::OnTimer(wxTimerEvent&)
 {
-    OnWaitEvent(event);
-    switch(event.GetKeyCode())
-    {
-    case WXK_NUMPAD0:
-        app->cpu->keys[0] = 1;
-    break;
+    wxClientDC clientDC(this);
+    DrawScreen(clientDC);
+}
 
-    case WXK_NUMPAD7:
-        app->cpu->keys[1] = 1;
-    break;
-
-    case WXK_NUMPAD8:
-        app->cpu->keys[2] = 1;
-    break;
-
-    case WXK_NUMPAD9:
-        app->cpu->keys[3] = 1;
-    break;
-
-    case WXK_NUMPAD4:
-        app->cpu->keys[4] = 1;
-    break;
-
-    case WXK_NUMPAD5:
-        app->cpu->keys[5] = 1;
-    break;
-
-    case WXK_NUMPAD6:
-        app->cpu->keys[6] = 1;
-    break;
-
-    case WXK_NUMPAD1:
-        app->cpu->keys[7] = 1;
-    break;
-
-    case WXK_NUMPAD2:
-        app->cpu->keys[8] = 1;
-    break;
-
-    case WXK_NUMPAD3:
-        app->cpu->keys[9] = 1;
-    break;
-
-    case WXK_NUMPAD_DIVIDE:
-        app->cpu->keys[10] = 1;
-    break;
-
-    case WXK_NUMPAD_MULTIPLY:
-        app->cpu->keys[11] = 1;
-    break;
-
-    case WXK_NUMPAD_SUBTRACT:
-        app->cpu->keys[12] = 1;
-    break;
-
-    case WXK_NUMPAD_ADD:
-        app->cpu->keys[13] = 1;
-    break;
-
-    case WXK_NUMPAD_ENTER:
-        app->cpu->keys[14] = 1;
-    break;
-
-    case WXK_NUMPAD_DECIMAL:
-        app->cpu->keys[15] = 1;
-    break;
-
-    case 'A':
-        if(app->mainFrame->pauseMenuItem->IsChecked())
-        {
-            app->mainFrame->pauseMenuItem->Check(false);
-            app->mainFrame->SetStatusText("Running");
-        }
-        else
-        {
-            app->mainFrame->pauseMenuItem->Check(true);
-            app->mainFrame->SetStatusText("Pause");
-        }
-        app->mainFrame->OnPause();
-    break;
-
-    case 'E':
-        if(app->mainFrame->pauseMenuItem->IsChecked() && app->cpu->romOpened)
-            app->cpu->Execute();
-    break;
-    }
+void GamePanel::PaintEvent(wxPaintEvent&)
+{
+    wxPaintDC paintDC(this);
+    DrawScreen(paintDC);
 }
