@@ -19,7 +19,7 @@ endif()
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "bin/")
 
-add_executable(Tutorial ${SRC})
+add_executable(Chip8Emu ${SRC})
 
 find_package(wxWidgets COMPONENTS adv core base REQUIRED)
 
