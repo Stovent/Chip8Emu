@@ -7,7 +7,7 @@ class Chip8Emu;
 
 #include <wx/app.h>
 
-#include "Core/Chip8.hpp"
+#include "Chip8/Chip8.hpp"
 #include "GUI/MainFrame.hpp"
 
 class Chip8Emu : public wxApp

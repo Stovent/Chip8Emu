@@ -3,8 +3,8 @@ cmake_minimum_required(VERSION 3.0)
 project(Chip8Emu)
 
 set(SRC
-		src/Core/Chip8.cpp
-		src/Core/Interpreter.cpp
+		src/Chip8/Chip8.cpp
+		src/Chip8/Interpreter.cpp
 		src/GUI/MainFrame.cpp
 		src/GUI/GamePanel.cpp
 		src/Chip8Emu.cpp

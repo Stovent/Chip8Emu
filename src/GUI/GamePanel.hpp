@@ -8,7 +8,7 @@ class GamePanel;
 #include <wx/timer.h>
 
 #include "MainFrame.hpp"
-#include "../Core/Chip8.hpp"
+#include "../Chip8/Chip8.hpp"
 
 class GamePanel : public wxPanel
 {
