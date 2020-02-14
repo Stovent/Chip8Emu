@@ -5,9 +5,11 @@ void Chip8::Interpreter()
     if(!romOpened)
         return;
 
-    timePoint = std::chrono::steady_clock::now();
+    delayTimePoint = std::chrono::steady_clock::now();
     while(run)
     {
+        std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
+
         const uint16_t opcode = GetNextWord();
         switch(GetInstruction(opcode))
         {
@@ -276,12 +278,13 @@ void Chip8::Interpreter()
             wxMessageBox("Unknown opcode: " + std::to_string(opcode) + " at location " + std::to_string(PC-2));
         }
 
-        std::chrono::nanoseconds t = std::chrono::steady_clock::now() - timePoint; // time to execute this instruction
+        std::chrono::nanoseconds execTime  = std::chrono::steady_clock::now() - start;
 
-        if(t.count() < clockInterval)
-            std::this_thread::sleep_for(std::chrono::nanoseconds(clockInterval-t.count()));
+        if(execTime.count() < clockInterval)
+            std::this_thread::sleep_for(std::chrono::nanoseconds(clockInterval-execTime.count()));
 
-        if(t.count() >= 16'666'666) // 16.666666 ms
+        std::chrono::nanoseconds delayTime = std::chrono::steady_clock::now() - delayTimePoint;
+        if(delayTime.count() >= 16'666'666) // 16.666666 ms
         {
             if(delay)
                 delay--;
@@ -292,7 +295,7 @@ void Chip8::Interpreter()
                 audio.Play();
             }
 
-            timePoint = std::chrono::steady_clock::now();
+            delayTimePoint = std::chrono::steady_clock::now();
         }
     }
 }

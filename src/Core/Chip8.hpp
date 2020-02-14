@@ -69,7 +69,7 @@ class Chip8
     uint16_t stack[16];
     uint8_t  V[16];
 
-    std::chrono::steady_clock::time_point timePoint;
+    std::chrono::steady_clock::time_point delayTimePoint;
     Instruction instructions[OPCODE_NBR];
 
     wxSound audio;
@@ -113,7 +113,7 @@ public:
     bool romOpened;
     std::string romPath;
 
-    Chip8(uint32_t frequency); // frequency in instruction per second
+    explicit Chip8(uint32_t frequency); // frequency in instruction per second
 
     void CloseROM();
     bool OpenROM(const std::string& path);

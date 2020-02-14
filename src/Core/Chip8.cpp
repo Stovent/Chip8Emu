@@ -9,7 +9,7 @@ Chip8::Chip8(uint32_t frequency) : audio(76, beep)
 {
     romOpened = run = false;
     Execute = &Chip8::Interpreter;
-    clockInterval = (1 / frequency) * 1'000'000'000.0; // in nanoseconds
+    clockInterval = (1.0 / frequency) * 1'000'000'000.0; // in nanoseconds
 
     memset(memory, 0, 512);
     Reset();
@@ -30,11 +30,9 @@ void Chip8::CloseROM()
 
 void Chip8::Draw(const uint8_t x, const uint8_t y, const uint8_t n)
 {
-    uint8_t line;
-
     for(int j = 0; j < n; j++)
     {
-        line = memory[I + j];
+        uint8_t line = memory[I + j];
 
         for(int i = 0; i < 8; i++)
         {
