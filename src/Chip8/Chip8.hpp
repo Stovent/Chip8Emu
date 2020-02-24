@@ -4,10 +4,9 @@
 class Chip8;
 
 #include <string>
+#include <chrono>
 
 #include <wx/sound.h>
-
-#include "../Chip8Emu.hpp"
 
 #define WIDTH  (64)
 #define HEIGHT (32)

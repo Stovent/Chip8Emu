@@ -7,15 +7,15 @@ wxBEGIN_EVENT_TABLE(GamePanel, wxPanel)
     EVT_PAINT(GamePanel::PaintEvent)
 wxEND_EVENT_TABLE()
 
-GamePanel::GamePanel(MainFrame* parent, Chip8* cpu) : wxPanel(parent), timer(this), screen(WIDTH, HEIGHT)
+GamePanel::GamePanel(wxFrame* parent, Chip8* cpu) : wxPanel(parent), timer(this), screen(WIDTH, HEIGHT)
 {
     chip8 = cpu;
     timer.Start(16);
+    screen.SetData(chip8->screen, true);
 }
 
 void GamePanel::DrawScreen(wxDC& dc)
 {
-    screen.SetData(chip8->screen, true);
     dc.DrawBitmap(wxBitmap(screen.Scale(GetSize().x, GetSize().y, wxIMAGE_QUALITY_NEAREST)), 0, 0);
 }
 

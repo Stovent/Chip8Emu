@@ -1,5 +1,8 @@
 #include "Chip8.hpp"
 
+#include <thread>
+#include <iostream>
+
 void Chip8::Interpreter()
 {
     if(!romOpened)
@@ -21,7 +24,7 @@ void Chip8::Interpreter()
             if(SP >= 0)
                 PC = stack[SP--];
             else
-                wxMessageBox("Stack empty (RET)");
+                std::cerr << "Stack empty (RET)" << std::endl;
             break;
 
         case JPaddr: // 1nnn
@@ -35,7 +38,7 @@ void Chip8::Interpreter()
                 PC = opcode & 0x0FFF;
             }
             else
-                wxMessageBox("Stack full (CALL)");
+                std::cerr << "Stack full (CALL)" << std::endl;
             break;
 
         case SEVxByte: // 3xkk
@@ -275,7 +278,7 @@ void Chip8::Interpreter()
         }
 
         default:
-            wxMessageBox("Unknown opcode: " + std::to_string(opcode) + " at location " + std::to_string(PC-2));
+            std::cerr << "Unknown opcode: 0x" << std::hex << opcode << " at location 0x" << (PC-2) << std::endl;
         }
 
         std::chrono::nanoseconds execTime  = std::chrono::steady_clock::now() - start;

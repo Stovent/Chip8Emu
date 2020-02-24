@@ -11,7 +11,7 @@ wxBEGIN_EVENT_TABLE(MainFrame, wxFrame)
     EVT_MENU(IDOnQuit,     MainFrame::OnQuit)
 wxEND_EVENT_TABLE()
 
-MainFrame::MainFrame(Chip8Emu* app, const wxString& title, const wxPoint& pos, const wxSize& size) : wxFrame(nullptr, wxID_ANY, title, pos, size)
+MainFrame::MainFrame(Chip8Emu* app, const wxString& title, const wxPoint& pos, const wxSize& size) : wxFrame(NULL, wxID_ANY, title, pos, size)
 {
     chip8Emu = app;
     gamePanel = new GamePanel(this, chip8Emu->chip8);

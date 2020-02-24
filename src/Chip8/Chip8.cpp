@@ -1,15 +1,10 @@
 #include "Chip8.hpp"
 
-#include <ctime>
-#include <ratio>
-#include <chrono>
-#include <cstdlib>
-
 Chip8::Chip8(uint32_t frequency) : audio(76, beep)
 {
     romOpened = run = false;
     Execute = &Chip8::Interpreter;
-    clockInterval = (1.0 / frequency) * 1'000'000'000.0; // in nanoseconds
+    clockInterval = (1.0L / frequency) * 1'000'000'000.0L; // in nanoseconds
 
     memset(memory, 0, 512);
     Reset();

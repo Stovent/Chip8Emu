@@ -17,7 +17,7 @@ class GamePanel : public wxPanel
     wxImage screen;
 
 public:
-    GamePanel(MainFrame* parent, Chip8* cpu);
+    GamePanel(wxFrame* parent, Chip8* cpu);
 
     void DrawScreen(wxDC& dc);
     void OnKeyDown(wxKeyEvent& event);
