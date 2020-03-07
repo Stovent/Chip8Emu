@@ -165,6 +165,7 @@ void Chip8::Reset()
         keys[i] = 0;
         stack[i] = 0;
     }
+    ClearScreen();
 }
 
 void Chip8::Run()
