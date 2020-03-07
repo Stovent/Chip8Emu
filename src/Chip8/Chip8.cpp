@@ -33,18 +33,19 @@ void Chip8::Draw(const uint8_t x, const uint8_t y, const uint8_t n)
         {
             if(line & (0x80 >> i))
             {
-                if(screen[(V[y] + j) * 3 * WIDTH + (V[x] + i) * 3])
+                uint16_t index = (V[y] + j) * 3 * WIDTH + (V[x] + i) * 3;
+                if(screen[index])
                 {
-                    screen[(V[y] + j) * 3 * WIDTH + (V[x] + i) * 3] = 0;
-                    screen[(V[y] + j) * 3 * WIDTH + (V[x] + i) * 3 + 1] = 0;
-                    screen[(V[y] + j) * 3 * WIDTH + (V[x] + i) * 3 + 2] = 0;
+                    screen[index] = 0;
+                    screen[index + 1] = 0;
+                    screen[index + 2] = 0;
                     VF = 1;
                 }
                 else
                 {
-                    screen[(V[y] + j) * 3 * WIDTH + (V[x] + i) * 3] = 255;
-                    screen[(V[y] + j) * 3 * WIDTH + (V[x] + i) * 3 + 1] = 255;
-                    screen[(V[y] + j) * 3 * WIDTH + (V[x] + i) * 3 + 2] = 255;
+                    screen[index] = 255;
+                    screen[index + 1] = 255;
+                    screen[index + 2] = 255;
                     VF = 0;
                 }
             }
