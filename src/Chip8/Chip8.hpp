@@ -112,6 +112,9 @@ public:
     bool romOpened;
     std::string romPath;
 
+    Chip8() = delete;
+    Chip8(Chip8&) = delete;
+    Chip8(Chip8&&) = delete;
     explicit Chip8(uint32_t frequency); // frequency in instruction per second
 
     void CloseROM();
