@@ -34,8 +34,6 @@ lines 7 8 9 and 1 2 3 are inverted to match the original keyboard.
 
 A B C D E F are respectly mapped on . / * - + F
 
-# 
-
 ## Shortcuts and UI
 
 A : pause/unpause emulation
@@ -58,7 +56,7 @@ package dependency: `libwxgtk3.0-dev`
 
 Install the dependency, then open a terminal in the root directory of the git and type:
 
-```
+```sh
 cmake .
 make -j$(nproc --all)
 ```
