@@ -8,11 +8,11 @@ void Chip8::Interpreter()
     if(!romOpened)
         return;
 
-    delayTimePoint = std::chrono::steady_clock::now();
+    std::chrono::steady_clock::time_point delayTimePoint = std::chrono::steady_clock::now();
+    std::chrono::time_point<std::chrono::steady_clock, std::chrono::duration<long double, std::nano>> start = std::chrono::steady_clock::now();
+
     while(run)
     {
-        std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
-
         const uint16_t opcode = GetNextWord();
         switch(GetInstruction(opcode))
         {
@@ -281,10 +281,8 @@ void Chip8::Interpreter()
             std::cerr << "Unknown opcode: 0x" << std::hex << opcode << " at location 0x" << (PC-2) << std::endl;
         }
 
-        std::chrono::nanoseconds execTime  = std::chrono::steady_clock::now() - start;
-
-        if(execTime.count() < clockInterval)
-            std::this_thread::sleep_for(std::chrono::nanoseconds(clockInterval-execTime.count()));
+        start += std::chrono::duration<long double, std::nano>(clockInterval);
+        std::this_thread::sleep_until(start);
 
         std::chrono::nanoseconds delayTime = std::chrono::steady_clock::now() - delayTimePoint;
         if(delayTime.count() >= 16'666'666) // 16.666666 ms

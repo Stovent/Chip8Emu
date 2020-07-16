@@ -69,7 +69,6 @@ class Chip8
     uint16_t stack[16];
     uint8_t  V[16];
 
-    std::chrono::steady_clock::time_point delayTimePoint;
     Instruction instructions[OPCODE_NBR];
 
     wxSound audio;
