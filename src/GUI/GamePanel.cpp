@@ -3,15 +3,15 @@
 wxBEGIN_EVENT_TABLE(GamePanel, wxPanel)
     EVT_KEY_DOWN(GamePanel::OnKeyDown)
     EVT_KEY_UP(GamePanel::OnKeyUp)
-    EVT_TIMER(wxID_ANY, GamePanel::OnTimer)
-    EVT_PAINT(GamePanel::PaintEvent)
+    EVT_TIMER(IDOnTimer, GamePanel::OnTimer)
+    EVT_PAINT(GamePanel::OnPaintEvent)
 wxEND_EVENT_TABLE()
 
-GamePanel::GamePanel(wxFrame* parent, Chip8* cpu) : wxPanel(parent), timer(this), screen(WIDTH, HEIGHT)
+GamePanel::GamePanel(MainFrame* parent, Chip8* cpu) : wxPanel(parent), timer(this, IDOnTimer)
 {
     chip8 = cpu;
     timer.Start(16);
-    screen.SetData(chip8->screen, true);
+    screen.Create(WIDTH, HEIGHT, chip8->screen, true);
 }
 
 void GamePanel::DrawScreen(wxDC& dc)
@@ -180,7 +180,7 @@ void GamePanel::OnTimer(wxTimerEvent&)
     DrawScreen(clientDC);
 }
 
-void GamePanel::PaintEvent(wxPaintEvent&)
+void GamePanel::OnPaintEvent(wxPaintEvent&)
 {
     wxPaintDC paintDC(this);
     DrawScreen(paintDC);

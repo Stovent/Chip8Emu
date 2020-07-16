@@ -34,6 +34,11 @@ void Chip8::Draw(const uint8_t x, const uint8_t y, const uint8_t n)
             if(line & (0x80 >> i))
             {
                 uint16_t index = (V[y] + j) * 3 * WIDTH + (V[x] + i) * 3;
+                if(index > SCREEN_SIZE)
+                {
+                    index -= SCREEN_SIZE;
+                }
+
                 if(screen[index])
                 {
                     screen[index] = 0;

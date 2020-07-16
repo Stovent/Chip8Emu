@@ -1,7 +1,8 @@
 #include "MainFrame.hpp"
 
-#include <wx/sizer.h>
 #include <wx/menu.h>
+#include <wx/sizer.h>
+#include <wx/msgdlg.h>
 #include <wx/filedlg.h>
 
 wxBEGIN_EVENT_TABLE(MainFrame, wxFrame)

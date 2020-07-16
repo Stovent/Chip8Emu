@@ -10,6 +10,7 @@ class Chip8;
 
 #define WIDTH  (64)
 #define HEIGHT (32)
+#define SCREEN_SIZE (WIDTH*HEIGHT*3)
 #define VF (V[15])
 #define OPCODE_NBR (34)
 
@@ -104,7 +105,7 @@ class Chip8
     uint32_t clockInterval;
 
 public:
-    uint8_t screen[WIDTH*HEIGHT*3]; // direct RGB data for performances
+    uint8_t screen[SCREEN_SIZE]; // direct RGB data for performances
     bool keys[16];
     int8_t lastKey;
 

@@ -4,7 +4,6 @@
 class MainFrame;
 
 #include <wx/frame.h>
-#include <wx/msgdlg.h>
 
 #include "GamePanel.hpp"
 #include "../Chip8Emu.hpp"
@@ -15,6 +14,7 @@ enum
     IDOnCloseROM,
     IDOnPause,
     IDOnQuit,
+    IDOnTimer,
 };
 
 class MainFrame : public wxFrame

@@ -17,13 +17,13 @@ class GamePanel : public wxPanel
     wxImage screen;
 
 public:
-    GamePanel(wxFrame* parent, Chip8* cpu);
+    GamePanel(MainFrame* parent, Chip8* cpu);
 
     void DrawScreen(wxDC& dc);
     void OnKeyDown(wxKeyEvent& event);
     void OnKeyUp(wxKeyEvent& event);
     void OnTimer(wxTimerEvent&);
-    void PaintEvent(wxPaintEvent&);
+    void OnPaintEvent(wxPaintEvent&);
 
     wxDECLARE_EVENT_TABLE();
 };
