@@ -3,7 +3,6 @@
 Chip8::Chip8(uint32_t frequency) : audio(76, beep)
 {
     romOpened = run = false;
-    Execute = &Chip8::Interpreter;
     clockInterval = (1.0L / frequency) * 1'000'000'000.0L; // in nanoseconds
 
     memset(memory, 0, 512);
@@ -174,9 +173,30 @@ void Chip8::Reset()
     ClearScreen();
 }
 
-void Chip8::Run()
+void Chip8::Run(const bool loop)
 {
-    (this->*Execute)();
+    if(!isRunning)
+    {
+        run = false;
+        if(executionThread.joinable())
+            executionThread.join();
+
+        run = loop;
+        executionThread = std::thread(&Chip8::Interpreter, this);
+    }
+}
+
+void Chip8::Stop(const bool wait)
+{
+    run = false;
+    if(wait)
+        if(executionThread.joinable())
+            executionThread.join();
+}
+
+bool Chip8::IsRunning() const
+{
+    return isRunning;
 }
 
 void Chip8::WaitKey(const uint8_t x)

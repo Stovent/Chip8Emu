@@ -71,7 +71,7 @@ void MainFrame::TooglePause()
 {
     if(chip8Emu->chip8->romOpened)
     {
-        if(chip8Emu->chip8->run)
+        if(chip8Emu->chip8->IsRunning())
         {
             chip8Emu->StopGameThread();
             pauseMenuItem->Check();

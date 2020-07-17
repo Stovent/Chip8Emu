@@ -3,8 +3,9 @@
 
 class Chip8;
 
-#include <string>
 #include <chrono>
+#include <string>
+#include <thread>
 
 #include <wx/sound.h>
 
@@ -70,6 +71,9 @@ class Chip8
     uint8_t  V[16];
 
     Instruction instructions[OPCODE_NBR];
+    std::thread executionThread;
+    bool run;
+    bool isRunning;
 
     wxSound audio;
     unsigned char beep[76] {0x52, 0x49, 0x46, 0x46, // RIFF
@@ -88,7 +92,6 @@ class Chip8
                 128, 0, 128, 0, 128, 0, 128, 0, 128, 0, 128, 0, 128, 0, 128, 0, 128, 0, 128, 0, 128, 0, 128, 0, 128, 0, 128, 0, 128, 0, 128, 0
     };
 
-    void (Chip8::*Execute)() = nullptr;
     void Interpreter();
 
     void ClearMemory();
@@ -97,7 +100,6 @@ class Chip8
     void GenerateInstructionSet();
     int8_t GetInstruction(const uint16_t opcode) const;
     uint16_t GetNextWord();
-    void Reset();
     void LoadFont();
     void WaitKey(const uint8_t x);
 
@@ -108,7 +110,6 @@ public:
     bool keys[16];
     int8_t lastKey;
 
-    bool run;
     bool romOpened;
     std::string romPath;
 
@@ -119,7 +120,10 @@ public:
 
     void CloseROM();
     bool OpenROM(const std::string& path);
-    void Run();
+    void Run(const bool loop = true);
+    void Stop(const bool wait = true);
+    void Reset();
+    bool IsRunning() const;
 };
 
 #endif // CHIP8_HPP

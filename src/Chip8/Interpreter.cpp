@@ -8,10 +8,11 @@ void Chip8::Interpreter()
     if(!romOpened)
         return;
 
+    isRunning = true;
     std::chrono::steady_clock::time_point delayTimePoint = std::chrono::steady_clock::now();
     std::chrono::time_point<std::chrono::steady_clock, std::chrono::duration<long double, std::nano>> start = std::chrono::steady_clock::now();
 
-    while(run)
+    do
     {
         const uint16_t opcode = GetNextWord();
         switch(GetInstruction(opcode))
@@ -298,5 +299,7 @@ void Chip8::Interpreter()
 
             delayTimePoint = std::chrono::steady_clock::now();
         }
-    }
+    } while(run);
+
+    isRunning = false;
 }

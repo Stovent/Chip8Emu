@@ -3,8 +3,6 @@
 
 class Chip8Emu;
 
-#include <thread>
-
 #include <wx/app.h>
 
 #include "Chip8/Chip8.hpp"
@@ -12,8 +10,6 @@ class Chip8Emu;
 
 class Chip8Emu : public wxApp
 {
-    std::thread* gameThread;
-
 public:
     Chip8* chip8;
     MainFrame* mainFrame;
