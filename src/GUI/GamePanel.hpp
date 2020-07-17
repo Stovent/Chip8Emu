@@ -13,6 +13,7 @@ class GamePanel;
 class GamePanel : public wxPanel
 {
     Chip8* chip8;
+    MainFrame* mainFrame;
     wxTimer timer;
     wxImage screen;
 

@@ -10,6 +10,7 @@ wxEND_EVENT_TABLE()
 GamePanel::GamePanel(MainFrame* parent, Chip8* cpu) : wxPanel(parent), timer(this, IDOnTimer)
 {
     chip8 = cpu;
+    mainFrame = parent;
     timer.Start(16);
     screen.Create(WIDTH, HEIGHT, chip8->screen, true);
 }
@@ -101,7 +102,6 @@ void GamePanel::OnKeyDown(wxKeyEvent& event)
     {
         chip8->lastKey = 15;
         chip8->keys[15] = 1;
-//        wxMessageBox("F");
     }
 }
 
@@ -171,6 +171,17 @@ void GamePanel::OnKeyUp(wxKeyEvent& event)
     else if(key == 70)
     {
         chip8->keys[15] = 0;
+    }
+    else if(key == 'A')
+    {
+        mainFrame->TooglePause();
+    }
+    else if(key == 'E')
+    {
+        if(chip8->IsRunning())
+            chip8->Stop();
+
+        chip8->Run(false);
     }
 }
 
