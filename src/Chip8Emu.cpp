@@ -9,16 +9,6 @@ bool Chip8Emu::OnInit()
 
 int Chip8Emu::OnExit()
 {
-    StopGameThread();
+    chip8->Stop(false);
     return 1;
-}
-
-void Chip8Emu::StartGameThread()
-{
-    chip8->Run();
-}
-
-void Chip8Emu::StopGameThread()
-{
-    chip8->Stop();
 }

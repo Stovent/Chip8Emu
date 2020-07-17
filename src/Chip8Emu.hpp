@@ -16,9 +16,6 @@ public:
 
     virtual bool OnInit();
     virtual int OnExit();
-
-    void StartGameThread();
-    void StopGameThread();
 };
 
 #endif // CHIP8EMU_HPP

@@ -46,7 +46,7 @@ void MainFrame::OnOpenROM(wxCommandEvent&)
     if(chip8Emu->chip8->OpenROM(openFileDialog.GetPath().ToStdString()))
     {
         if(!pauseMenuItem->IsChecked())
-            chip8Emu->StartGameThread();
+            chip8Emu->chip8->Run();
     }
     else
         wxMessageBox("Could not open ROM!");
@@ -73,12 +73,12 @@ void MainFrame::TooglePause()
     {
         if(chip8Emu->chip8->IsRunning())
         {
-            chip8Emu->StopGameThread();
+            chip8Emu->chip8->Stop();
             pauseMenuItem->Check();
         }
         else
         {
-            chip8Emu->StartGameThread();
+            chip8Emu->chip8->Run();
             pauseMenuItem->Check(false);
         }
     }
