@@ -25,7 +25,8 @@ public:
     Chip8Emu* chip8Emu;
     GamePanel* gamePanel;
     wxMenuItem* pauseMenuItem;
-    MemoryList* memoryList;
+    MemoryList* memoryViewer;
+    wxListCtrl* chip8Status;
     wxAuiManager manager;
 
     MainFrame(Chip8Emu* app, const wxString& title, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize);

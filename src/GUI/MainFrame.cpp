@@ -16,31 +16,47 @@ wxEND_EVENT_TABLE()
 MainFrame::MainFrame(Chip8Emu* app, const wxString& title, const wxPoint& pos, const wxSize& size) : wxFrame(NULL, wxID_ANY, title, pos, size), manager(this)
 {
     chip8Emu = app;
+    memoryViewer = new MemoryList(this, chip8Emu->chip8->GetMemory());
+    chip8Status = new wxListCtrl(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_REPORT | wxLC_HRULES | wxLC_VRULES);
     gamePanel = new GamePanel(this, chip8Emu->chip8);
-    wxListCtrl* listCtrl = new wxListCtrl(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_REPORT | wxLC_HRULES | wxLC_VRULES);
 
     wxListItem regCol;
     regCol.SetId(0);
     regCol.SetText("Register");
     regCol.SetWidth(70);
-    listCtrl->InsertColumn(0, regCol);
+    chip8Status->InsertColumn(0, regCol);
 
     wxListItem valueCol;
     valueCol.SetId(1);
     valueCol.SetText("Value");
     valueCol.SetWidth(60);
-    listCtrl->InsertColumn(1, valueCol);
+    chip8Status->InsertColumn(1, valueCol);
 
-    listCtrl->InsertItem(0, "delay");
-    listCtrl->InsertItem(2, "sound");
-    listCtrl->InsertItem(4, "PC");
-    listCtrl->InsertItem(6, "I");
-    listCtrl->InsertItem(8, "SP");
+    wxListItem item;
+    item.SetId(0);
+    item.SetText("delay");
+    chip8Status->InsertItem(item);
+
+    item.SetId(1);
+    item.SetText("sound");
+    chip8Status->InsertItem(item);
+
+    item.SetId(2);
+    item.SetText("PC");
+    chip8Status->InsertItem(item);
+
+    item.SetId(3);
+    item.SetText("I");
+    chip8Status->InsertItem(item);
+
+    item.SetId(4);
+    item.SetText("SP");
+    chip8Status->InsertItem(item);
+
     RefreshListCtrl();
 
-    memoryList = new MemoryList(this, chip8Emu->chip8->GetMemory());
-    manager.AddPane(listCtrl, wxBOTTOM, "Chip8 status");
-    manager.AddPane(memoryList, wxRIGHT, "Memory");
+    manager.AddPane(chip8Status, wxBOTTOM, "Chip8 status");
+    manager.AddPane(memoryViewer, wxRIGHT, "Memory");
     manager.AddPane(gamePanel, wxCENTER);
     manager.Update();
 
@@ -114,10 +130,10 @@ void MainFrame::TooglePause()
 
 void MainFrame::RefreshListCtrl()
 {
-//    Chip8State state = chip8Emu->chip8->GetState();
-//    listCtrl->SetItem(0, 1, std::to_string(state.delay));
-//    listCtrl->SetItem(2, 1, std::to_string(state.sound));
-//    listCtrl->SetItem(4, 1, std::to_string(state.PC));
-//    listCtrl->SetItem(6, 1, std::to_string(state.I));
-//    listCtrl->SetItem(8, 1, std::to_string(state.SP));
+    Chip8State state = chip8Emu->chip8->GetState();
+    chip8Status->SetItem(0, 1, std::to_string(state.delay));
+    chip8Status->SetItem(1, 1, std::to_string(state.sound));
+    chip8Status->SetItem(2, 1, std::to_string(state.PC));
+    chip8Status->SetItem(3, 1, std::to_string(state.I));
+    chip8Status->SetItem(4, 1, std::to_string(state.SP));
 }
