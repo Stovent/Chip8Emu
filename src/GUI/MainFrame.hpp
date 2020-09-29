@@ -3,10 +3,12 @@
 
 class MainFrame;
 
-#include <wx/frame.h>
-
 #include "GamePanel.hpp"
 #include "../Chip8Emu.hpp"
+#include "MemoryList.hpp"
+
+#include <wx/frame.h>
+#include <wx/aui/framemanager.h>
 
 enum
 {
@@ -23,8 +25,11 @@ public:
     Chip8Emu* chip8Emu;
     GamePanel* gamePanel;
     wxMenuItem* pauseMenuItem;
+    MemoryList* memoryList;
+    wxAuiManager manager;
 
     MainFrame(Chip8Emu* app, const wxString& title, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize);
+    ~MainFrame();
 
     void OnOpenROM(wxCommandEvent&);
     void OnCloseROM(wxCommandEvent&);
@@ -32,6 +37,7 @@ public:
     void OnQuit(wxCommandEvent&);
 
     void TooglePause();
+    void RefreshListCtrl();
 
     wxDECLARE_EVENT_TABLE();
 };

@@ -1,9 +1,10 @@
 #include "MainFrame.hpp"
 
-#include <wx/menu.h>
-#include <wx/sizer.h>
-#include <wx/msgdlg.h>
 #include <wx/filedlg.h>
+#include <wx/menu.h>
+#include <wx/msgdlg.h>
+#include <wx/sizer.h>
+#include <wx/listctrl.h>
 
 wxBEGIN_EVENT_TABLE(MainFrame, wxFrame)
     EVT_MENU(IDOnOpenROM,  MainFrame::OnOpenROM)
@@ -12,14 +13,36 @@ wxBEGIN_EVENT_TABLE(MainFrame, wxFrame)
     EVT_MENU(IDOnQuit,     MainFrame::OnQuit)
 wxEND_EVENT_TABLE()
 
-MainFrame::MainFrame(Chip8Emu* app, const wxString& title, const wxPoint& pos, const wxSize& size) : wxFrame(NULL, wxID_ANY, title, pos, size)
+MainFrame::MainFrame(Chip8Emu* app, const wxString& title, const wxPoint& pos, const wxSize& size) : wxFrame(NULL, wxID_ANY, title, pos, size), manager(this)
 {
     chip8Emu = app;
     gamePanel = new GamePanel(this, chip8Emu->chip8);
+    wxListCtrl* listCtrl = new wxListCtrl(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_REPORT | wxLC_HRULES | wxLC_VRULES);
 
-    wxBoxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
-    sizer->Add(gamePanel, 1, wxEXPAND);
-    SetSizer(sizer);
+    wxListItem regCol;
+    regCol.SetId(0);
+    regCol.SetText("Register");
+    regCol.SetWidth(70);
+    listCtrl->InsertColumn(0, regCol);
+
+    wxListItem valueCol;
+    valueCol.SetId(1);
+    valueCol.SetText("Value");
+    valueCol.SetWidth(60);
+    listCtrl->InsertColumn(1, valueCol);
+
+    listCtrl->InsertItem(0, "delay");
+    listCtrl->InsertItem(2, "sound");
+    listCtrl->InsertItem(4, "PC");
+    listCtrl->InsertItem(6, "I");
+    listCtrl->InsertItem(8, "SP");
+    RefreshListCtrl();
+
+    memoryList = new MemoryList(this, chip8Emu->chip8->GetMemory());
+    manager.AddPane(listCtrl, wxBOTTOM, "Chip8 status");
+    manager.AddPane(memoryList, wxRIGHT, "Memory");
+    manager.AddPane(gamePanel, wxCENTER);
+    manager.Update();
 
     wxMenu* fileMenu = new wxMenu();
     fileMenu->Append(IDOnOpenROM, "Open ROM\tCtrl+O");
@@ -35,6 +58,11 @@ MainFrame::MainFrame(Chip8Emu* app, const wxString& title, const wxPoint& pos, c
 
     SetMenuBar(menuBar);
     Show();
+}
+
+MainFrame::~MainFrame()
+{
+    manager.UnInit();
 }
 
 void MainFrame::OnOpenROM(wxCommandEvent&)
@@ -82,4 +110,14 @@ void MainFrame::TooglePause()
             pauseMenuItem->Check(false);
         }
     }
+}
+
+void MainFrame::RefreshListCtrl()
+{
+//    Chip8State state = chip8Emu->chip8->GetState();
+//    listCtrl->SetItem(0, 1, std::to_string(state.delay));
+//    listCtrl->SetItem(2, 1, std::to_string(state.sound));
+//    listCtrl->SetItem(4, 1, std::to_string(state.PC));
+//    listCtrl->SetItem(6, 1, std::to_string(state.I));
+//    listCtrl->SetItem(8, 1, std::to_string(state.SP));
 }

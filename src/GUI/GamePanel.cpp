@@ -189,6 +189,7 @@ void GamePanel::OnTimer(wxTimerEvent&)
 {
     wxClientDC clientDC(this);
     DrawScreen(clientDC);
+    mainFrame->memoryList->Refresh();
 }
 
 void GamePanel::OnPaintEvent(wxPaintEvent&)

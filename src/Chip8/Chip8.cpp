@@ -206,3 +206,21 @@ void Chip8::WaitKey(const uint8_t x)
     V[x] = lastKey;
     lastKey = -1;
 }
+
+Chip8State Chip8::GetState() const
+{
+    Chip8State state;
+    state.delay = delay;
+    state.sound = sound;
+    state.PC = PC;
+    state.I = I;
+    state.SP = SP;
+    memcpy(state.stack, stack, sizeof(*stack) * 16);
+    memcpy(state.V, V, sizeof(*V) * 8);
+    return state;
+}
+
+const uint8_t* Chip8::GetMemory() const
+{
+    return memory;
+}

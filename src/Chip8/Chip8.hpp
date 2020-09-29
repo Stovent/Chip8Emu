@@ -14,6 +14,7 @@ class Chip8;
 #define SCREEN_SIZE (WIDTH*HEIGHT*3)
 #define VF (V[15])
 #define OPCODE_NBR (34)
+#define CHIP8_MEMORY_SIZE (4096)
 
 enum InstructionSet
 {
@@ -53,20 +54,31 @@ enum InstructionSet
     LDVxI
 };
 
-typedef struct
+struct Chip8State
+{
+    uint8_t delay;
+    uint8_t sound;
+    uint16_t PC;
+    uint16_t I;
+    int8_t  SP;
+    uint16_t stack[16];
+    uint8_t  V[16];
+};
+
+struct Instruction
 {
     uint16_t opcode;
     uint16_t mask;
-} Instruction;
+};
 
 class Chip8
 {
-    uint8_t memory[4096];
+    uint8_t memory[CHIP8_MEMORY_SIZE];
     uint8_t delay;
     uint8_t sound;
-    int8_t  SP;
     uint16_t PC;
     uint16_t I;
+    int8_t  SP;
     uint16_t stack[16];
     uint8_t  V[16];
 
@@ -124,6 +136,8 @@ public:
     void Stop(const bool wait = true);
     void Reset();
     bool IsRunning() const;
+    Chip8State GetState() const;
+    const uint8_t* GetMemory() const;
 };
 
 #endif // CHIP8_HPP

@@ -3,12 +3,13 @@ cmake_minimum_required(VERSION 3.0)
 project(Chip8Emu)
 
 set(SRC
-		src/Chip8/Chip8.cpp
-		src/Chip8/Interpreter.cpp
-		src/GUI/MainFrame.cpp
-		src/GUI/GamePanel.cpp
-		src/Chip8Emu.cpp
-		src/main.cpp)
+	src/Chip8/Chip8.cpp
+	src/Chip8/Interpreter.cpp
+	src/GUI/MainFrame.cpp
+	src/GUI/GamePanel.cpp
+	src/GUI/MemoryList.cpp
+	src/Chip8Emu.cpp
+	src/main.cpp)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
