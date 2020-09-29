@@ -21,6 +21,9 @@ enum
 
 class MainFrame : public wxFrame
 {
+    void CreatePanels();
+    void CreateMenuBar();
+
 public:
     Chip8Emu* chip8Emu;
     GamePanel* gamePanel;

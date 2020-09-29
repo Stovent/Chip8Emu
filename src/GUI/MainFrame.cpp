@@ -20,46 +20,47 @@ MainFrame::MainFrame(Chip8Emu* app, const wxString& title, const wxPoint& pos, c
     chip8Status = new wxListCtrl(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_REPORT | wxLC_HRULES | wxLC_VRULES);
     gamePanel = new GamePanel(this, chip8Emu->chip8);
 
-    wxListItem regCol;
-    regCol.SetId(0);
-    regCol.SetText("Register");
-    regCol.SetWidth(70);
-    chip8Status->InsertColumn(0, regCol);
+    CreatePanels();
+    CreateMenuBar();
 
-    wxListItem valueCol;
-    valueCol.SetId(1);
-    valueCol.SetText("Value");
-    valueCol.SetWidth(60);
-    chip8Status->InsertColumn(1, valueCol);
+    Show();
+}
 
+static void addItem(wxListCtrl* list, const long id, const wxString text)
+{
     wxListItem item;
-    item.SetId(0);
-    item.SetText("delay");
-    chip8Status->InsertItem(item);
+    item.SetId(id);
+    item.SetText(text);
+    list->InsertItem(item);
+}
 
-    item.SetId(1);
-    item.SetText("sound");
-    chip8Status->InsertItem(item);
+void MainFrame::CreatePanels()
+{
+    wxListItem col;
+    col.SetId(0);
+    col.SetText("Register");
+    col.SetWidth(70);
+    chip8Status->InsertColumn(0, col);
 
-    item.SetId(2);
-    item.SetText("PC");
-    chip8Status->InsertItem(item);
+    col.SetId(1);
+    col.SetText("Value");
+    col.SetWidth(60);
+    chip8Status->InsertColumn(1, col);
 
-    item.SetId(3);
-    item.SetText("I");
-    chip8Status->InsertItem(item);
-
-    item.SetId(4);
-    item.SetText("SP");
-    chip8Status->InsertItem(item);
-
-    RefreshListCtrl();
+    addItem(chip8Status, 0, "delay");
+    addItem(chip8Status, 1, "sound");
+    addItem(chip8Status, 2, "PC");
+    addItem(chip8Status, 3, "I");
+    addItem(chip8Status, 4, "SP");
 
     manager.AddPane(chip8Status, wxBOTTOM, "Chip8 status");
     manager.AddPane(memoryViewer, wxRIGHT, "Memory");
     manager.AddPane(gamePanel, wxCENTER);
     manager.Update();
+}
 
+void MainFrame::CreateMenuBar()
+{
     wxMenu* fileMenu = new wxMenu();
     fileMenu->Append(IDOnOpenROM, "Open ROM\tCtrl+O");
     fileMenu->Append(IDOnCloseROM, "Close ROM\tCtrl+C");
@@ -73,7 +74,6 @@ MainFrame::MainFrame(Chip8Emu* app, const wxString& title, const wxPoint& pos, c
     menuBar->Append(emulationMenu, "Emulation");
 
     SetMenuBar(menuBar);
-    Show();
 }
 
 MainFrame::~MainFrame()
