@@ -13,7 +13,7 @@ wxBEGIN_EVENT_TABLE(MainFrame, wxFrame)
     EVT_MENU(IDOnQuit,     MainFrame::OnQuit)
 wxEND_EVENT_TABLE()
 
-MainFrame::MainFrame(Chip8Emu* app, const wxString& title, const wxPoint& pos, const wxSize& size) : wxFrame(NULL, wxID_ANY, title, pos, size), manager(this)
+MainFrame::MainFrame(Chip8Emu* app) : wxFrame(NULL, wxID_ANY, "Chip8Emu", wxPoint(50, 50), wxSize(800, 600)), manager(this)
 {
     chip8Emu = app;
     memoryViewer = new MemoryList(this, chip8Emu->chip8->GetMemory());

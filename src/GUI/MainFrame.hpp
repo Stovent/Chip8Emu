@@ -32,7 +32,7 @@ public:
     wxListCtrl* chip8Status;
     wxAuiManager manager;
 
-    MainFrame(Chip8Emu* app, const wxString& title, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize);
+    MainFrame(Chip8Emu* app);
     ~MainFrame();
 
     void OnOpenROM(wxCommandEvent&);
