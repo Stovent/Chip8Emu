@@ -1,8 +1,11 @@
 #include "Chip8Emu.hpp"
 
+Chip8Emu::Chip8Emu() : wxApp(), chip8(500)
+{
+}
+
 bool Chip8Emu::OnInit()
 {
-    chip8 = new Chip8(500);
     mainFrame = new MainFrame(this);
     return true;
 }
@@ -10,7 +13,6 @@ bool Chip8Emu::OnInit()
 int Chip8Emu::OnExit()
 {
     mainFrame->Close();
-    chip8->Stop(false);
-    delete chip8;
+    chip8.Stop(false);
     return 1;
 }

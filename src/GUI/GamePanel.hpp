@@ -12,13 +12,13 @@ class GamePanel;
 
 class GamePanel : public wxPanel
 {
-    Chip8* chip8;
+    Chip8& chip8;
     MainFrame* mainFrame;
     wxTimer timer;
     wxImage screen;
 
 public:
-    GamePanel(MainFrame* parent, Chip8* cpu);
+    GamePanel(MainFrame* parent, Chip8& cpu);
 
     void DrawScreen(wxDC& dc);
     void OnKeyDown(wxKeyEvent& event);

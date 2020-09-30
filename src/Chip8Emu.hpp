@@ -11,7 +11,9 @@ class Chip8Emu;
 class Chip8Emu : public wxApp
 {
 public:
-    Chip8* chip8;
+    Chip8Emu();
+
+    Chip8 chip8;
     MainFrame* mainFrame;
 
     virtual bool OnInit();

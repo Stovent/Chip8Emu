@@ -216,7 +216,7 @@ Chip8State Chip8::GetState() const
     state.I = I;
     state.SP = SP;
     memcpy(state.stack, stack, sizeof(*stack) * 16);
-    memcpy(state.V, V, sizeof(*V) * 8);
+    memcpy(state.V, V, sizeof(*V) * 16);
     return state;
 }
 

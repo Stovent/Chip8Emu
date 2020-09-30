@@ -1,10 +1,10 @@
 #include "MainFrame.hpp"
+#include "../utils.hpp"
 
 #include <wx/filedlg.h>
 #include <wx/menu.h>
 #include <wx/msgdlg.h>
 #include <wx/sizer.h>
-#include <wx/listctrl.h>
 
 wxBEGIN_EVENT_TABLE(MainFrame, wxFrame)
     EVT_MENU(IDOnOpenROM,  MainFrame::OnOpenROM)
@@ -16,8 +16,8 @@ wxEND_EVENT_TABLE()
 MainFrame::MainFrame(Chip8Emu* app) : wxFrame(NULL, wxID_ANY, "Chip8Emu", wxPoint(50, 50), wxSize(800, 600)), manager(this)
 {
     chip8Emu = app;
-    memoryViewer = new MemoryList(this, chip8Emu->chip8->GetMemory());
-    chip8Status = new wxListCtrl(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_REPORT | wxLC_HRULES | wxLC_VRULES);
+    memoryViewer = new MemoryList(this, chip8Emu->chip8.GetMemory());
+    chip8Status = new wxPropertyGrid(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxPG_LIMITED_EDITING);
     gamePanel = new GamePanel(this, chip8Emu->chip8);
 
     CreatePanels();
@@ -26,32 +26,28 @@ MainFrame::MainFrame(Chip8Emu* app) : wxFrame(NULL, wxID_ANY, "Chip8Emu", wxPoin
     Show();
 }
 
-static void addItem(wxListCtrl* list, const long id, const wxString text)
-{
-    wxListItem item;
-    item.SetId(id);
-    item.SetText(text);
-    list->InsertItem(item);
-}
+#define APPEND(label, name) chip8Status->Append(new wxIntProperty(label, name)); chip8Status->SetPropertyReadOnly(label);
 
 void MainFrame::CreatePanels()
 {
-    wxListItem col;
-    col.SetId(0);
-    col.SetText("Register");
-    col.SetWidth(70);
-    chip8Status->InsertColumn(0, col);
+    chip8Status->SetDoubleBuffered(true);
+    chip8Status->SetColumnCount(3);
+    APPEND("delay", wxPG_LABEL)
+    APPEND("sound", wxPG_LABEL)
+    APPEND("PC", wxPG_LABEL)
+    APPEND("I", wxPG_LABEL)
+    APPEND("SP", wxPG_LABEL)
 
-    col.SetId(1);
-    col.SetText("Value");
-    col.SetWidth(60);
-    chip8Status->InsertColumn(1, col);
+    auto stack = chip8Status->Append(new wxPropertyCategory("Stack"));
+    auto V = chip8Status->Append(new wxPropertyCategory("V"));
 
-    addItem(chip8Status, 0, "delay");
-    addItem(chip8Status, 1, "sound");
-    addItem(chip8Status, 2, "PC");
-    addItem(chip8Status, 3, "I");
-    addItem(chip8Status, 4, "SP");
+    for(int i = 0; i < 16; i++)
+    {
+        chip8Status->AppendIn(stack, new wxIntProperty(toHex(i, "%X"), "stack" + toHex(i, "%X")));
+        chip8Status->AppendIn(V, new wxIntProperty(toHex(i, "%X"), "V" + toHex(i, "%X")));
+    }
+    chip8Status->SetPropertyReadOnly("Stack");
+    chip8Status->SetPropertyReadOnly("V");
 
     manager.AddPane(chip8Status, wxBOTTOM, "Chip8 status");
     manager.AddPane(memoryViewer, wxRIGHT, "Memory");
@@ -87,10 +83,10 @@ void MainFrame::OnOpenROM(wxCommandEvent&)
     if (openFileDialog.ShowModal() == wxID_CANCEL)
         return;
 
-    if(chip8Emu->chip8->OpenROM(openFileDialog.GetPath().ToStdString()))
+    if(chip8Emu->chip8.OpenROM(openFileDialog.GetPath().ToStdString()))
     {
         if(!pauseMenuItem->IsChecked())
-            chip8Emu->chip8->Run();
+            chip8Emu->chip8.Run();
     }
     else
         wxMessageBox("Could not open ROM!");
@@ -98,7 +94,7 @@ void MainFrame::OnOpenROM(wxCommandEvent&)
 
 void MainFrame::OnCloseROM(wxCommandEvent&)
 {
-    chip8Emu->chip8->CloseROM();
+    chip8Emu->chip8.CloseROM();
 }
 
 void MainFrame::OnPause(wxCommandEvent&)
@@ -113,16 +109,16 @@ void MainFrame::OnQuit(wxCommandEvent&)
 
 void MainFrame::TooglePause()
 {
-    if(chip8Emu->chip8->romOpened)
+    if(chip8Emu->chip8.romOpened)
     {
-        if(chip8Emu->chip8->IsRunning())
+        if(chip8Emu->chip8.IsRunning())
         {
-            chip8Emu->chip8->Stop();
+            chip8Emu->chip8.Stop();
             pauseMenuItem->Check();
         }
         else
         {
-            chip8Emu->chip8->Run();
+            chip8Emu->chip8.Run();
             pauseMenuItem->Check(false);
         }
     }
@@ -130,10 +126,29 @@ void MainFrame::TooglePause()
 
 void MainFrame::RefreshListCtrl()
 {
-    Chip8State state = chip8Emu->chip8->GetState();
-    chip8Status->SetItem(0, 1, std::to_string(state.delay));
-    chip8Status->SetItem(1, 1, std::to_string(state.sound));
-    chip8Status->SetItem(2, 1, std::to_string(state.PC));
-    chip8Status->SetItem(3, 1, std::to_string(state.I));
-    chip8Status->SetItem(4, 1, std::to_string(state.SP));
+    Chip8State state = chip8Emu->chip8.GetState();
+    chip8Status->SetPropertyValue("delay", state.delay);
+    chip8Status->SetPropertyCell("delay", 2, "0x" + toHex(state.delay));
+    chip8Status->SetPropertyValue("sound", state.sound);
+    chip8Status->SetPropertyCell("sound", 2, "0x" + toHex(state.sound));
+    chip8Status->SetPropertyValue("PC", state.PC);
+    chip8Status->SetPropertyCell("PC", 2, "0x" + toHex(state.PC));
+    chip8Status->SetPropertyValue("I", state.I);
+    chip8Status->SetPropertyCell("I", 2, "0x" + toHex(state.I));
+    chip8Status->SetPropertyValue("SP", state.SP);
+    chip8Status->SetPropertyCell("SP", 2, "0x" + toHex(state.SP));
+
+    char s[7];
+    char v[3];
+    for(int i = 0; i < 16; i++)
+    {
+        sprintf(s, "stack%X", i);
+        chip8Status->SetPropertyValue(s, (int)state.stack[i]);
+        chip8Status->SetPropertyCell(s, 2, "0x" + toHex(state.stack[i]));
+        sprintf(v, "V%X", i);
+        chip8Status->SetPropertyValue(v, state.V[i]);
+        chip8Status->SetPropertyCell(v, 2, "0x" + toHex(state.V[i]));
+    }
+
+    chip8Status->Refresh();
 }

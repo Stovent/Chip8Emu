@@ -9,6 +9,7 @@ class MainFrame;
 
 #include <wx/frame.h>
 #include <wx/aui/framemanager.h>
+#include <wx/propgrid/propgrid.h>
 
 enum
 {
@@ -29,10 +30,10 @@ public:
     GamePanel* gamePanel;
     wxMenuItem* pauseMenuItem;
     MemoryList* memoryViewer;
-    wxListCtrl* chip8Status;
+    wxPropertyGrid* chip8Status;
     wxAuiManager manager;
 
-    MainFrame(Chip8Emu* app);
+    explicit MainFrame(Chip8Emu* app);
     ~MainFrame();
 
     void OnOpenROM(wxCommandEvent&);

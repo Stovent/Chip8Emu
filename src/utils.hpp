@@ -3,10 +3,10 @@
 
 #include <string>
 
-inline std::string toHex(const uint32_t value)
+inline std::string toHex(const uint32_t value, const char* format = NULL)
 {
     char c[10] = {0};
-    sprintf(c, "%02X", value);
+    sprintf(c, format ? format : "%02X", value);
     return c;
 }
 
