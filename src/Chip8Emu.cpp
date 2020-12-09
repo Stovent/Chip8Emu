@@ -12,7 +12,6 @@ bool Chip8Emu::OnInit()
 
 int Chip8Emu::OnExit()
 {
-    mainFrame->Close();
     chip8.Stop(false);
     return 1;
 }

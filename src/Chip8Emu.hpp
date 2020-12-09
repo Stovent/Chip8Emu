@@ -16,8 +16,8 @@ public:
     Chip8 chip8;
     MainFrame* mainFrame;
 
-    virtual bool OnInit();
-    virtual int OnExit();
+    virtual bool OnInit() override;
+    virtual int OnExit() override;
 };
 
 #endif // CHIP8EMU_HPP
