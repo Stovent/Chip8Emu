@@ -49,9 +49,9 @@ void MainFrame::CreatePanels()
     chip8Status->SetPropertyReadOnly("Stack");
     chip8Status->SetPropertyReadOnly("V");
 
-    manager.AddPane(chip8Status, wxBOTTOM, "Chip8 status");
-    manager.AddPane(memoryViewer, wxRIGHT, "Memory");
     manager.AddPane(gamePanel, wxCENTER);
+    manager.AddPane(chip8Status, wxAuiPaneInfo().Caption("Chip8 status").Bottom().BestSize(0, 100));
+    manager.AddPane(memoryViewer, wxAuiPaneInfo().Caption("Memory").Right().BestSize(160, 0));
     manager.Update();
 }
 
@@ -126,7 +126,7 @@ void MainFrame::TooglePause()
 
 void MainFrame::RefreshListCtrl()
 {
-    Chip8State state = chip8Emu->chip8.GetState();
+    const Chip8State state = chip8Emu->chip8.GetState();
     chip8Status->SetPropertyValue("delay", state.delay);
     chip8Status->SetPropertyCell("delay", 2, "0x" + toHex(state.delay));
     chip8Status->SetPropertyValue("sound", state.sound);
