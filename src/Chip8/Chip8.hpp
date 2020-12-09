@@ -87,8 +87,7 @@ class Chip8
     bool run;
     bool isRunning;
 
-    wxSound audio;
-    unsigned char beep[76] {0x52, 0x49, 0x46, 0x46, // RIFF
+    unsigned char beep[76] = {0x52, 0x49, 0x46, 0x46, // RIFF
                 0x3C, 0, 0, 0, // file size
                 0x57, 0x41, 0x56, 0x45, // WAVE
                 0x66, 0x6D, 0x74, 0x20,// fmt
@@ -118,6 +117,7 @@ class Chip8
     uint32_t clockInterval;
 
 public:
+    wxSound audio;
     uint8_t screen[SCREEN_SIZE]; // direct RGB data for performances
     bool keys[16];
     int8_t lastKey;
