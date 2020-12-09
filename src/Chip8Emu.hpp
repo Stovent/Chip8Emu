@@ -14,7 +14,6 @@ public:
     Chip8Emu();
 
     Chip8 chip8;
-    MainFrame* mainFrame;
 
     virtual bool OnInit() override;
     virtual int OnExit() override;

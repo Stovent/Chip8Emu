@@ -6,7 +6,7 @@ Chip8Emu::Chip8Emu() : wxApp(), chip8(700)
 
 bool Chip8Emu::OnInit()
 {
-    mainFrame = new MainFrame(this);
+    new MainFrame(this);
     return true;
 }
 
