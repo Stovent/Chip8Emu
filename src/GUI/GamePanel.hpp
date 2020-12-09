@@ -3,12 +3,12 @@
 
 class GamePanel;
 
+#include "MainFrame.hpp"
+#include "../Chip8/Chip8.hpp"
+
 #include <wx/dcclient.h>
 #include <wx/panel.h>
 #include <wx/timer.h>
-
-#include "MainFrame.hpp"
-#include "../Chip8/Chip8.hpp"
 
 class GamePanel : public wxPanel
 {

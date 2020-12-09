@@ -3,10 +3,10 @@
 
 class Chip8Emu;
 
-#include <wx/app.h>
-
 #include "Chip8/Chip8.hpp"
 #include "GUI/MainFrame.hpp"
+
+#include <wx/app.h>
 
 class Chip8Emu : public wxApp
 {

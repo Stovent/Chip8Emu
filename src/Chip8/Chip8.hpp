@@ -3,11 +3,11 @@
 
 class Chip8;
 
+#include <wx/sound.h>
+
 #include <chrono>
 #include <string>
 #include <thread>
-
-#include <wx/sound.h>
 
 #define WIDTH  (64)
 #define HEIGHT (32)
