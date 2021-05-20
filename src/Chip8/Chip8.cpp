@@ -209,12 +209,13 @@ void Chip8::WaitKey(const uint8_t x)
 
 Chip8State Chip8::GetState() const
 {
-    Chip8State state;
-    state.delay = delay;
-    state.sound = sound;
-    state.PC = PC;
-    state.I = I;
-    state.SP = SP;
+    Chip8State state {
+        .delay = delay,
+        .sound = sound,
+        .PC = PC,
+        .I = I,
+        .SP = SP,
+    };
     memcpy(state.stack, stack, sizeof(*stack) * 16);
     memcpy(state.V, V, sizeof(*V) * 16);
     return state;

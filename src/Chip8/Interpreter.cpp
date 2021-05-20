@@ -113,7 +113,7 @@ void Chip8::Interpreter()
         {
             uint8_t x = (opcode & 0x0F00) >> 8;
             uint8_t y = (opcode & 0x00F0) >> 4;
-            V[x] |= V[y];
+            V[x] ^= V[y];
             break;
         }
 
