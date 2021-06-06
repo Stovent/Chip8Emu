@@ -8,6 +8,8 @@ class MainFrame;
 #include "MemoryList.hpp"
 
 #include <wx/frame.h>
+#include <wx/slider.h>
+#include <wx/spinctrl.h>
 #include <wx/aui/framemanager.h>
 #include <wx/propgrid/propgrid.h>
 
@@ -28,6 +30,9 @@ class MainFrame : public wxFrame
 public:
     Chip8Emu* chip8Emu;
     GamePanel* gamePanel;
+    wxPanel* speedPanel;
+    wxSpinCtrl* speedSpin;
+    wxSlider* speedSlider;
     wxMenuItem* pauseMenuItem;
     MemoryList* memoryViewer;
     wxPropertyGrid* chip8Status;

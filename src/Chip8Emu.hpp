@@ -8,6 +8,10 @@ class Chip8Emu;
 
 #include <wx/app.h>
 
+#define CHIP8_DEFAULT_SPEED (500)
+#define CHIP8_MIN_SPEED (1)
+#define CHIP8_MAX_SPEED (2000)
+
 class Chip8Emu : public wxApp
 {
 public:

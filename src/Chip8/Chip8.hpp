@@ -128,13 +128,14 @@ public:
     Chip8() = delete;
     Chip8(Chip8&) = delete;
     Chip8(Chip8&&) = delete;
-    explicit Chip8(uint32_t frequency); // frequency in instruction per second
+    explicit Chip8(size_t frequency); // frequency in instruction per second
 
     void CloseROM();
     bool OpenROM(const std::string& path);
     void Run(const bool loop = true);
     void Stop(const bool wait = true);
     void Reset();
+    void SetEmulationSpeed(size_t frequency);
     bool IsRunning() const;
     Chip8State GetState() const;
     const uint8_t* GetMemory() const;

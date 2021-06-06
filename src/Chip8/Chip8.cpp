@@ -1,9 +1,9 @@
 #include "Chip8.hpp"
 
-Chip8::Chip8(uint32_t frequency) : audio(76, beep)
+Chip8::Chip8(size_t frequency) : audio(76, beep)
 {
     romOpened = run = false;
-    clockInterval = (1.0L / frequency) * 1'000'000'000.0L; // in nanoseconds
+    SetEmulationSpeed(frequency);
 
     memset(memory, 0, 512);
     Reset();
@@ -20,6 +20,11 @@ void Chip8::ClearScreen()
 void Chip8::CloseROM()
 {
     romOpened = run = false;
+}
+
+void Chip8::SetEmulationSpeed(size_t frequency)
+{
+    clockInterval = (1.0L / frequency) * 1'000'000'000.0L; // in nanoseconds
 }
 
 void Chip8::Draw(const uint8_t x, const uint8_t y, const uint8_t n)

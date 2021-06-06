@@ -1,6 +1,6 @@
 #include "Chip8Emu.hpp"
 
-Chip8Emu::Chip8Emu() : wxApp(), chip8(700)
+Chip8Emu::Chip8Emu() : wxApp(), chip8(CHIP8_DEFAULT_SPEED)
 {
 }
 

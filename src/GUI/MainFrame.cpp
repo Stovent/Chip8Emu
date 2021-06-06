@@ -16,9 +16,22 @@ wxEND_EVENT_TABLE()
 MainFrame::MainFrame(Chip8Emu* app) : wxFrame(NULL, wxID_ANY, "Chip8Emu", wxPoint(50, 50), wxSize(800, 600)), manager(this)
 {
     chip8Emu = app;
+    speedPanel = new wxPanel(this);
     memoryViewer = new MemoryList(this, chip8Emu->chip8.GetMemory());
     chip8Status = new wxPropertyGrid(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxPG_LIMITED_EDITING);
     gamePanel = new GamePanel(this, chip8Emu->chip8);
+
+    speedSpin = new wxSpinCtrl(speedPanel, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, CHIP8_MIN_SPEED, CHIP8_MAX_SPEED, CHIP8_DEFAULT_SPEED);
+    speedSpin->Bind(wxEVT_SPINCTRL, [=] (const wxSpinEvent&) -> void {
+        this->speedSlider->SetValue(this->speedSpin->GetValue());
+        this->chip8Emu->chip8.SetEmulationSpeed(this->speedSpin->GetValue());
+    });
+
+    speedSlider = new wxSlider(speedPanel, wxID_ANY, CHIP8_DEFAULT_SPEED, CHIP8_MIN_SPEED, CHIP8_MAX_SPEED);
+    speedSlider->Bind(wxEVT_SLIDER, [=] (const wxCommandEvent&) {
+        this->speedSpin->SetValue(this->speedSlider->GetValue());
+        this->chip8Emu->chip8.SetEmulationSpeed(this->speedSlider->GetValue());
+    });
 
     CreatePanels();
     CreateMenuBar();
@@ -49,6 +62,12 @@ void MainFrame::CreatePanels()
     chip8Status->SetPropertyReadOnly("Stack");
     chip8Status->SetPropertyReadOnly("V");
 
+    wxSizer* speedSizer = new wxBoxSizer(wxHORIZONTAL);
+    speedSizer->Add(speedSpin, 0);
+    speedSizer->Add(speedSlider, 1);
+    speedPanel->SetSizer(speedSizer);
+
+    manager.AddPane(speedPanel, wxAuiPaneInfo().Caption("Emulation speed").Top().Floatable(false));
     manager.AddPane(gamePanel, wxCENTER);
     manager.AddPane(chip8Status, wxAuiPaneInfo().Caption("Chip8 status").Bottom().BestSize(0, 100));
     manager.AddPane(memoryViewer, wxAuiPaneInfo().Caption("Memory").Right().BestSize(160, 0));

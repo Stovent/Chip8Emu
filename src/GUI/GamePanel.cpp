@@ -16,7 +16,9 @@ GamePanel::GamePanel(MainFrame* parent, Chip8& cpu) : wxPanel(parent), chip8(cpu
 
 void GamePanel::DrawScreen(wxDC& dc)
 {
-    dc.DrawBitmap(wxBitmap(screen.Scale(GetSize().x, GetSize().y, wxIMAGE_QUALITY_NEAREST)), 0, 0);
+    const wxSize size = GetSize();
+    if(size.x > 0 && size.y > 0)
+        dc.DrawBitmap(wxBitmap(screen.Scale(size.x, size.y, wxIMAGE_QUALITY_NEAREST)), 0, 0);
 }
 
 void GamePanel::OnKeyDown(wxKeyEvent& event)
