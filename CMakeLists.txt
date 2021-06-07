@@ -22,7 +22,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "bin/")
 
 add_executable(Chip8Emu ${SRC})
 
-find_package(wxWidgets COMPONENTS adv core base REQUIRED)
+find_package(wxWidgets COMPONENTS aui adv core base propgrid REQUIRED)
 
 if(wxWidgets_FOUND)
 	include("${wxWidgets_USE_FILE}")
