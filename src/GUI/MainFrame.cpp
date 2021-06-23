@@ -36,6 +36,7 @@ MainFrame::MainFrame(Chip8Emu* app) : wxFrame(NULL, wxID_ANY, "Chip8Emu", wxPoin
     CreatePanels();
     CreateMenuBar();
 
+    gamePanel->SetFocus();
     Show();
 }
 

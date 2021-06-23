@@ -129,6 +129,7 @@ public:
     Chip8(Chip8&) = delete;
     Chip8(Chip8&&) = delete;
     explicit Chip8(size_t frequency); // frequency in instruction per second
+    ~Chip8();
 
     void CloseROM();
     bool OpenROM(const std::string& path);

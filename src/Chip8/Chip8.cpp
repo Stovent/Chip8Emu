@@ -12,6 +12,11 @@ Chip8::Chip8(size_t frequency) : audio(76, beep)
     GenerateInstructionSet();
 }
 
+Chip8::~Chip8()
+{
+    Stop(true);
+}
+
 void Chip8::ClearScreen()
 {
     memset(screen, 0, WIDTH*HEIGHT*3);
@@ -194,9 +199,13 @@ void Chip8::Run(const bool loop)
 void Chip8::Stop(const bool wait)
 {
     run = false;
-    if(wait)
-        if(executionThread.joinable())
+    if(executionThread.joinable())
+    {
+        if(wait)
             executionThread.join();
+        else
+            executionThread.detach();
+    }
 }
 
 bool Chip8::IsRunning() const
